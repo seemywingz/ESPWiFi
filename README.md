@@ -19,62 +19,6 @@ The ESPWiFi library is designed to simplify managing WiFi functionalities on ESP
 
 ## Usage
 
-### Initialization
-
-Include the library in your sketch:
-
-```cpp
-#include <ESPWiFi.h>
-```
-
-Create an instance of the ESPWiFi class:
-
-```cpp
-ESPWiFi espWiFi("Your_SSID", "Your_Password");
-```
-
-For custom IP configuration:
-
-```cpp
-IPAddress customIP(192, 168, 1, 100);
-IPAddress gateway(192, 168, 1, 1);
-IPAddress subnet(255, 255, 255, 0);
-ESPWiFi espWiFi("Your_SSID", "Your_Password", customIP, gateway, subnet);
-```
-
-### Connecting as a Client
-
-To connect to a WiFi network:
-
-```cpp
-espWiFi.startAsClient();
-```
-
-### Starting as an Access Point
-
-To set up the ESP8266 as an Access Point:
-
-```cpp
-espWiFi.startAsAccessPoint();
-```
-
-### Web Server Operations
-
-To manage client requests on the web server:
-
-```cpp
-espWiFi.handleClient();
-```
-
-### Additional Methods
-
-- `espWiFi.isAccessPoint()`: Verify if the device is running as an Access Point.
-- `espWiFi.localIP()`: Obtain the local IP address.
-- `espWiFi.infoString()`: Get a string with WiFi information.
-- `espWiFi.checkWiFi()`: Check the status of the WiFi connection.
-
-## Examples
-
 Example: Launching an ESPWiFi Access Point
 
 ```cpp
