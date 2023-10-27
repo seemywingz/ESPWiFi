@@ -98,7 +98,7 @@ void loop() {
   });
 }
 ```
-For more examples, visit [Additional Examples](https://github.com/seemywingz/ESPWiFi/tree/main/examples).
+[Additional Examples](https://github.com/seemywingz/ESPWiFi/tree/main/examples).
 
 ## License
 
