@@ -52,7 +52,7 @@ void ESPWiFi::startAsClient() {
     webServer.send(200, "text/html", clientIndexHTML());
   });
   webServer.onNotFound(
-      [this]() { webServer.send(200, "text/html", boardInfoHTML()); });
+      [this]() { webServer.send(200, "text/html", pageNotFoundHTML()); });
 }
 
 void ESPWiFi::startAsAccessPoint() {
@@ -63,7 +63,7 @@ void ESPWiFi::startAsAccessPoint() {
   webServer.on("/", HTTP_GET,
                [this]() { webServer.send(200, "text/html", APIndexHTML()); });
   webServer.onNotFound(
-      [this]() { webServer.send(200, "text/html", boardInfoHTML()); });
+      [this]() { webServer.send(200, "text/html", pageNotFoundHTML()); });
   webServer.begin();
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);

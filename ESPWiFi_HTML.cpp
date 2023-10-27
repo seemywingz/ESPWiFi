@@ -16,6 +16,16 @@ String ESPWiFi::sharedHTMLStyle() {
          "text-align: center;}"
          ".info {font-size: 18px; color: #333; margin-bottom: 5px; text-align: "
          "center;}"
+         ".wifi-signal { display: inline-block; width: 50px; height: 25px; "
+         "position: relative; }"
+         ".bar { width: 10%; height: 20%; background-color: silver; position: "
+         "absolute; bottom: 0; }"
+         ".bar.filled { background-color: black; }"
+         ".bar:nth-child(1) { left: 0; }"
+         ".bar:nth-child(2) { left: 20%; height: 40%; }"
+         ".bar:nth-child(3) { left: 40%; height: 60%; }"
+         ".bar:nth-child(4) { left: 60%; height: 80%; }"
+         ".bar:nth-child(5) { left: 80%; height: 100%;}"
          "</style>";
 }
 
@@ -57,18 +67,6 @@ String ESPWiFi::clientIndexHTML() {
       "<div class='info'>IP Address: " + WiFi.localIP().toString() + "</div>";
   indexHTML += "<div class='info'>RSSI: " + String(rssi) + " dBm " +
                rssiDisplay + "</div>";
-  indexHTML += "<div class='section'>";
-  indexHTML += "<div class='header'>Connected Hosts</div>";
-
-  // Get the ESP8266's IP address
-  IPAddress startIP = ip;  // Start IP address
-  startIP[3] = 1;          // Set the last octet to 1
-
-  // Calculate the end IP address (adjust this based on your network size)
-  IPAddress endIP = ip;  // End IP address
-  endIP[3] = 254;        // Set the last octet to 254
-
-  indexHTML += "</div>";
   indexHTML += "<button onclick=\"location.href='/?autoRefresh=" +
                String((autoRefresh ? "false" : "true")) + "'\">" +
                String((autoRefresh ? "Disable" : "Enable")) +
@@ -126,38 +124,16 @@ String ESPWiFi::APIndexHTML() {
   indexHTML += "</div>";
 
   indexHTML += "<div class='section'>";
-  indexHTML += "<div class='header'>Access Point</div>";
-  indexHTML +=
-      "<div class='info'>Chip ID: " + String(ESP.getChipId()) + "</div>";
-  indexHTML +=
-      "<div class='info'>Flash Chip ID: " + String(ESP.getFlashChipId()) +
-      "</div>";
-  indexHTML +=
-      "<div class='info'>Flash Chip Speed: " + String(ESP.getFlashChipSpeed()) +
-      " Hz</div>";
-  indexHTML += "<div class='info'>Free Heap: " + String(ESP.getFreeHeap()) +
-               " bytes</div>";
-  indexHTML += "</div>";
+  indexHTML += boardInfoHTML();
   indexHTML += "</div></body></html>";
   return indexHTML;
 }
 
 String ESPWiFi::boardInfoHTML() {
   String html = sharedHTMLStyle();
-  html += "</head><body>";
   html += "<div class='container'>";
   html += "<div class='section'>";
-  html += "<div class='header'>Page Not Found</div>";
-  html += "<div class='info'>URI: " + webServer.uri() + "</div>";
-  html += "<div class='info'>Method: " +
-          String(webServer.method() == HTTP_GET ? "GET" : "POST") + "</div>";
-  html += "<h2>Request Parameters</h2>";
-  html += "<ul>";
-  for (uint8_t i = 0; i < webServer.args(); i++) {
-    html += "<li>" + webServer.argName(i) + ": " + webServer.arg(i) + "</li>";
-  }
-  html += "</ul>";
-  html += "<h2>ESP8266 Board Details</h2>";
+  html += "<div class='header'>ESP8266 Board Details</div>";
   html += "<ul>";
   html +=
       "<li><strong>Board Type:</strong> NodeMcu Mini Wireless D1 Module "
@@ -181,6 +157,26 @@ String ESPWiFi::boardInfoHTML() {
   html += "<li><strong>Flash Mode:</strong> " + String(ESP.getFlashChipMode()) +
           "</li>";
   html += "</ul>";
-  html += "</div></div></body></html>";
+  html += "</div></div>";
+  return html;
+}
+
+String ESPWiFi::pageNotFoundHTML() {
+  String html = sharedHTMLStyle();
+  html += "</head><body>";
+  html += "<div class='container'>";
+  html += "<div class='section'>";
+  html += "<div class='header'>Page Not Found</div>";
+  html += "<div class='info'>URI: " + webServer.uri() + "</div>";
+  html += "<div class='info'>Method: " +
+          String(webServer.method() == HTTP_GET ? "GET" : "POST") + "</div>";
+  html += "<div class='header'>Request Parameters</div>";
+  html += "<ul>";
+  for (uint8_t i = 0; i < webServer.args(); i++) {
+    html += "<li>" + webServer.argName(i) + ": " + webServer.arg(i) + "</li>";
+  }
+  html += "</ul>";
+  html += boardInfoHTML();
+  html += "</div></body></html>";
   return html;
 }
