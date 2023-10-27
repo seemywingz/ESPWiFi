@@ -11,6 +11,5 @@ void setup() {
 
 void loop() {
   espWiFi.handleClient();
-  Serial.print("IP Address: ");
-  Serial.println(espWiFi.infoString());
+  espWiFi.runMillis(1000, []() { Serial.println(espWiFi.infoString()); });
 }

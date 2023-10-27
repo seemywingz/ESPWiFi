@@ -1,7 +1,7 @@
 #include <ESPWiFi.h>
 
-String ssid = "connectedness";
-String password = "ReallyLongPassword123!@#";
+String ssid = "ESPWiFiAP";
+String password = "12345678";
 ESPWiFi espWiFi(ssid, password);
 
 void setup() {

@@ -29,6 +29,7 @@ class ESPWiFi {
   String MACAddressToString(uint8_t* mac);
   ESP8266WebServer* webserver();
   void startAsAccessPoint();
+  String boardInfoHTML();
   String clientIndexHTML();
   String APIndexHTML();
   void connectToWiFi();

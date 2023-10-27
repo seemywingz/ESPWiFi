@@ -4,21 +4,21 @@
 #include "indexHTML.h"
 
 // setup the wifi
-String ssid = "connectedness";                 // your network SSID (name)
-String password = "ReallyLongPassword123!@#";  // your network password
+String ssid = "YOU_SSID";           // your network SSID (name)
+String password = "YOUR_PASSWORD";  // your network password
 ESPWiFi espWiFi(ssid, password);
 
 void setup() {
-  Serial.begin(115200);  // output to the serial terminal for debugging
-  initHandlers();
+  Serial.begin(115200);     // output to the serial terminal for debugging
+  initHandlers();           // initialize the web handlers
   espWiFi.startAsClient();  // start the web server
 }
 
 void loop() {
-  espWiFi.handleClient();  // Handling of incoming requests
-  espWiFi.runMillis(1000, []() {
+  espWiFi.handleClient();         // Handling of incoming requests
+  espWiFi.runMillis(1000, []() {  // print info every second
     Serial.println(espWiFi.infoString());
-  });  // print info every second
+  });
 }
 
 void toggleLED() {  // toggle the LED

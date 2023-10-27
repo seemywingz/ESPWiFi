@@ -51,6 +51,8 @@ void ESPWiFi::startAsClient() {
   webServer.on("/", HTTP_GET, [this]() {
     webServer.send(200, "text/html", clientIndexHTML());
   });
+  webServer.onNotFound(
+      [this]() { webServer.send(200, "text/html", boardInfoHTML()); });
 }
 
 void ESPWiFi::startAsAccessPoint() {
@@ -60,6 +62,8 @@ void ESPWiFi::startAsAccessPoint() {
   WiFi.softAP(ssid, password);
   webServer.on("/", HTTP_GET,
                [this]() { webServer.send(200, "text/html", APIndexHTML()); });
+  webServer.onNotFound(
+      [this]() { webServer.send(200, "text/html", boardInfoHTML()); });
   webServer.begin();
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
@@ -228,6 +232,52 @@ String ESPWiFi::APIndexHTML() {
   indexHTML += "</div>";
   indexHTML += "</div></body></html>";
   return indexHTML;
+}
+
+String ESPWiFi::boardInfoHTML() {  // return the board info as a HTML string
+  String message = "<html><body>";
+  message += "<h1>Board Information</h1>";
+  message += "<p>URI: " + webServer.uri() + "</p>";
+  message +=
+      "<p>Method: " + String(webServer.method() == HTTP_GET ? "GET" : "POST") +
+      "</p>";
+  message += "<h2>Request Parameters</h2>";
+  message += "<ul>";
+  for (uint8_t i = 0; i < webServer.args(); i++) {
+    message +=
+        "<li>" + webServer.argName(i) + ": " + webServer.arg(i) + "</li>";
+  }
+  message += "</ul>";
+  message += "<h2>Board Details</h2>";
+  message += "<ul>";
+  message +=
+      "<li><strong>Board Type:</strong> NodeMcu Mini Wireless D1 Module "
+      "(ESP8266 ESP-12F)</li>";
+  message += "<li><strong>Firmware Version:</strong> " +
+             String(ESP.getCoreVersion()) + "</li>";
+  message += "<li><strong>SDK Version:</strong> " +
+             String(ESP.getSdkVersion()) + "</li>";
+  message += "<li><strong>Flash Chip ID:</strong> " +
+             String(ESP.getFlashChipId(), HEX) + "</li>";
+  message += "<li><strong>Flash Chip Size:</strong> " +
+             String(ESP.getFlashChipSize() / (1024 * 1024)) + " MB</li>";
+  message += "<li><strong>Free Heap:</strong> " + String(ESP.getFreeHeap()) +
+             " bytes</li>";
+  message +=
+      "<li><strong>Chip ID:</strong> " + String(ESP.getChipId(), HEX) + "</li>";
+  message += "<li><strong>CPU Frequency:</strong> " +
+             String(ESP.getCpuFreqMHz()) + " MHz</li>";
+  message += "<li><strong>Flash Frequency:</strong> " +
+             String(ESP.getFlashChipSpeed() / 1000000) + " MHz</li>";
+  message += "<li><strong>Flash Mode:</strong> " +
+             String(ESP.getFlashChipMode()) + "</li>";
+  message += "</ul>";
+  message += "<h2>LED State</h2>";
+  message += "<p>" +
+             String((digitalRead(LED_BUILTIN) == HIGH) ? "LED off" : "LED on") +
+             "</p>";
+  message += "</body></html>";
+  return message;
 }
 
 String ESPWiFi::MACAddressToString(uint8_t* mac) {
