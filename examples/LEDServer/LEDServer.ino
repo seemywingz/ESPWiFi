@@ -1,13 +1,12 @@
 // NodeMcu Mini Wireless D1 Module: ESP8266 ESP-12F
-#include <Arduino.h>
-#include <ESPWifi.h>
+#include <ESPWiFi.h>
 
 #include "indexHTML.h"
 
 // setup the wifi
-char ssid[] = "connectedness";             // your network SSID (name)
-char pass[] = "ReallyLongPassword123!@#";  // your network password
-ESPWiFi espWiFi(ssid, pass);
+String ssid = "connectedness";             // your network SSID (name)
+String password = "ReallyLongPassword123!@#";  // your network password
+ESPWiFi espWiFi(ssid, password);
 
 void setup() {
   Serial.begin(115200);  // output to the serial terminal for debugging

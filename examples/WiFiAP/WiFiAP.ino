@@ -1,7 +1,8 @@
 #include <Arduino.h>
 #include <ESPWiFi.h>
 
-#include "serverInfo.h"
+String ssid = "ESPWiFiAP";
+String password = "12345678";
 ESPWiFi espWiFi(ssid, password, IPAddress(9, 9, 9, 9));
 
 void setup() {

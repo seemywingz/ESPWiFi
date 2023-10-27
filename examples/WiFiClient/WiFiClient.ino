@@ -1,8 +1,7 @@
-#include <Arduino.h>
 #include <ESPWiFi.h>
 
-const char* ssid = "connectedness";
-const char* password = "ReallyLongPassword123!@#";
+String ssid = "connectedness";
+String password = "ReallyLongPassword123!@#";
 ESPWiFi espWiFi(ssid, password);
 
 void setup() {
