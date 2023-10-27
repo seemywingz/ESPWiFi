@@ -1,4 +1,4 @@
-# ESPWiFi Library
+# ESPWiFi
 
 The ESPWiFi library is designed to simplify managing WiFi functionalities on ESP8266 boards. It enables effortless connections to WiFi networks, Access Point (AP) setup, and basic web server operations.
 
