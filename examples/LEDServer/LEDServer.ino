@@ -9,9 +9,9 @@ String password = "12345678";  // your network password
 ESPWiFi espWiFi(ssid, password);
 
 void setup() {
-  Serial.begin(115200);     // output to the serial terminal for debugging
-  initHandlers();           // initialize the web handlers
-  espWiFi.startAsClient();  // start the web server
+  Serial.begin(115200);          // output to the serial terminal for debugging
+  initHandlers();                // initialize the web handlers
+  espWiFi.startAsAccessPoint();  // start the web server
 }
 
 void loop() {
