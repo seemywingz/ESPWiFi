@@ -4,7 +4,7 @@
 #include "indexHTML.h"
 
 // setup the wifi
-String ssid = "connectedness";             // your network SSID (name)
+String ssid = "connectedness";                 // your network SSID (name)
 String password = "ReallyLongPassword123!@#";  // your network password
 ESPWiFi espWiFi(ssid, password);
 

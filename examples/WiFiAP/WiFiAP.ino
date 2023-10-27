@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <ESPWiFi.h>
 
 String ssid = "ESPWiFiAP";
