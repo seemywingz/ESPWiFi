@@ -1,6 +1,6 @@
 #include <ESPWiFi.h>
 
-String ssid = "ESPWiFiAP";
+String ssid = "ESPWiFi";
 String password = "12345678";
 ESPWiFi espWiFi(ssid, password);
 

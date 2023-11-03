@@ -4,7 +4,7 @@
 #include "indexHTML.h"
 
 // setup the wifi
-String ssid = "ESPWiFiAP";     // your network SSID (name)
+String ssid = "ESPWiFi";       // your network SSID (name)
 String password = "12345678";  // your network password
 ESPWiFi espWiFi(ssid, password);
 

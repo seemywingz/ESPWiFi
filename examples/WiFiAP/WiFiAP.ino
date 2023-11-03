@@ -1,6 +1,6 @@
 #include <ESPWiFi.h>  // include the ESPWiFi library
 
-String ssid = "ESPWiFiAP";     // your network SSID (name)
+String ssid = "ESPWiFi";       // your network SSID (name)
 String password = "12345678";  // your network password
 // create an instance of the ESPWiFi class with
 // the SSID, password and Custom IP address
