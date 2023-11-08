@@ -31,10 +31,14 @@ void ESPWiFi::connectToWiFi() {
   WiFi.begin(ssid, password);
   pinMode(LED_BUILTIN, OUTPUT);
   while (WiFi.status() != WL_CONNECTED) {
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(500);
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(500);
+    if (connectSubroutine != NULL) {
+      connectSubroutine();
+    } else {
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(500);
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(500);
+    }
   }
   webServer.begin();
   ip = WiFi.localIP();
@@ -104,6 +108,10 @@ void ESPWiFi::checkWiFi() {
       connectToWiFi();
     }
   });
+}
+
+void ESPWiFi::setConnectSubroutine(void (*subroutine)()) {
+  connectSubroutine = subroutine;
 }
 
 void ESPWiFi::handleClient() {

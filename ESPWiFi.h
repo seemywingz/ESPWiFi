@@ -18,6 +18,7 @@ class ESPWiFi {
   IPAddress subnet;
   IPAddress gateway;
   ESP8266WebServer webServer;
+  void (*connectSubroutine)();
   const unsigned long wifiCheckInterval = 60000;  // Check every 60 seconds
 
  public:
@@ -26,6 +27,7 @@ class ESPWiFi {
   ESPWiFi(String defaultSSID, String defaultPassword, IPAddress customIP,
           IPAddress customGateway, IPAddress customSubnet);
   void runMillis(unsigned long millis, std::function<void()> callback);
+  void setConnectSubroutine(void (*subroutine)());
   String MACAddressToString(uint8_t* mac);
   ESP8266WebServer* webserver();
   void startAsAccessPoint();
