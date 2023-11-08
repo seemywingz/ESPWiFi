@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 
 class ESPWiFi {
  private:
@@ -12,8 +13,9 @@ class ESPWiFi {
   String password;
   String hostname;
   String indexHTML;
+  String domain;
   bool APEnabled;
-  bool DNSEnabled;
+  bool mDNSEnabled;
   IPAddress ip;
   IPAddress subnet;
   IPAddress gateway;
@@ -29,6 +31,7 @@ class ESPWiFi {
   void runMillis(unsigned long millis, std::function<void()> callback);
   void setConnectSubroutine(void (*subroutine)());
   String MACAddressToString(uint8_t* mac);
+  void enableMDNS(String domainName);
   ESP8266WebServer* webserver();
   void startAsAccessPoint();
   String pageNotFoundHTML();
@@ -37,7 +40,6 @@ class ESPWiFi {
   String boardInfoHTML();
   String APIndexHTML();
   void connectToWiFi();
-  bool isAccessPoint();
   void startAsClient();
   IPAddress localIP();
   void handleClient();

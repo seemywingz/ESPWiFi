@@ -40,6 +40,16 @@ void ESPWiFi::connectToWiFi() {
       delay(500);
     }
   }
+
+  if (mDNSEnabled) {
+    if (!MDNS.begin(domain)) {
+      Serial.println("Error setting up MDNS responder!");
+      while (1) {
+        delay(1000);
+      }
+    }
+  }
+
   webServer.begin();
   ip = WiFi.localIP();
   gateway = WiFi.gatewayIP();
@@ -47,6 +57,10 @@ void ESPWiFi::connectToWiFi() {
   Serial.println(infoString());
   analogWrite(LED_BUILTIN, 255 / 2);
   Serial.print("Connected to WiFi Network: ");
+
+  if (mDNSEnabled) {
+    MDNS.addService("http", "tcp", 80);
+  }
 }
 
 void ESPWiFi::startAsClient() {
@@ -116,9 +130,15 @@ void ESPWiFi::setConnectSubroutine(void (*subroutine)()) {
 
 void ESPWiFi::handleClient() {
   webServer.handleClient();
+  if (mDNSEnabled) {
+    MDNS.update();
+  }
   checkWiFi();
 }
 
-bool ESPWiFi::isAccessPoint() { return APEnabled; }
+void ESPWiFi::enableMDNS(String domainName) {
+  domain = domainName;
+  mDNSEnabled = true;
+}
 IPAddress ESPWiFi::localIP() { return WiFi.softAPIP(); }
 ESP8266WebServer* ESPWiFi::webserver() { return &webServer; }
