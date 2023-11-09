@@ -26,7 +26,26 @@ String ESPWiFi::sharedHTMLStyle() {
          ".bar:nth-child(3) { left: 40%; height: 60%; }"
          ".bar:nth-child(4) { left: 60%; height: 80%; }"
          ".bar:nth-child(5) { left: 80%; height: 100%;}"
-         "</style>";
+         "</style>"
+         "</head>";
+}
+
+String ESPWiFi::setupPageHTML() {
+  String html = sharedHTMLStyle();
+  html += "<body>";
+  html += "<div class='container'>";
+  html += "<div class='section'>";
+  html += "<div class='header'>Setup WiFi Connection</div>";
+  html += "<form action='/save' method='post'>";
+  html += "<input type='text' name='ssid' placeholder='SSID' required>";
+  html +=
+      "<input type='password' name='password' placeholder='Password' required>";
+  html += "<input type='submit' value='Save'>";
+  html += "</form>";
+  html += "</div>";
+  html += "</div>";
+  html += "</body></html>";
+  return html;
 }
 
 String ESPWiFi::clientIndexHTML() {
@@ -178,5 +197,20 @@ String ESPWiFi::pageNotFoundHTML() {
   html += "</ul>";
   html += boardInfoHTML();
   html += "</div></body></html>";
+  return html;
+}
+
+String ESPWiFi::eraseCredentialsPageHTML() {
+  String html = sharedHTMLStyle();
+  html += "<body>";
+  html += "<div class='container'>";
+  html += "<div class='section'>";
+  html += "<div class='header'>Erase WiFi Credentials</div>";
+  html += "<form action='/erase' method='post'>";
+  html += "<input type='submit' value='Erase WiFi Settings'>";
+  html += "</form>";
+  html += "</div>";
+  html += "</div>";
+  html += "</body></html>";
   return html;
 }

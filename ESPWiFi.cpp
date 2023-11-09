@@ -40,37 +40,62 @@ void ESPWiFi::connectToWiFi() {
       delay(500);
     }
   }
-
-  if (mDNSEnabled) {
-    if (!MDNS.begin(domain)) {
-      Serial.println("Error setting up MDNS responder!");
-      while (1) {
-        delay(1000);
-      }
-    }
-  }
-
-  webServer.begin();
+  initializeMDNS();
   ip = WiFi.localIP();
   gateway = WiFi.gatewayIP();
   subnet = WiFi.subnetMask();
   Serial.println(infoString());
   analogWrite(LED_BUILTIN, 255 / 2);
   Serial.print("Connected to WiFi Network: ");
+}
 
-  if (mDNSEnabled) {
-    MDNS.addService("http", "tcp", 80);
+void ESPWiFi::startWebServer() {
+  if (APEnabled) {
+    webServer.on("/", HTTP_GET,
+                 [this]() { webServer.send(200, "text/html", APIndexHTML()); });
+  } else {
+    webServer.on("/", HTTP_GET, [this]() {
+      webServer.send(200, "text/html", clientIndexHTML());
+    });
   }
+
+  webServer.on("/setup", HTTP_GET,
+               [this]() { webServer.send(200, "text/html", setupPageHTML()); });
+
+  webServer.on("/save", HTTP_POST, [this]() {
+    // Save the received credentials
+    String ssid = webServer.arg("ssid");
+    String password = webServer.arg("password");
+    saveWiFiCredentials(
+        ssid, password);  // Implement this function to save the credentials
+    webServer.send(200, "text/html",
+                   "<p>Credentials saved. The module will now restart.</p>");
+    delay(1000);
+    ESP.restart();
+  });
+
+  webServer.on("/erase", HTTP_GET, [this]() {
+    webServer.send(200, "text/html", eraseCredentialsPageHTML());
+  });
+
+  webServer.on("/erase", HTTP_POST, [this]() {
+    clearWiFiCredentials();
+    webServer.send(
+        200, "text/html",
+        "<p>WiFi settings have been erased. Please restart the device.</p>");
+    // Optionally, you can also restart the ESP automatically
+    ESP.restart();
+  });
+  webServer.onNotFound(
+      [this]() { webServer.send(200, "text/html", pageNotFoundHTML()); });
+
+  webServer.begin();
 }
 
 void ESPWiFi::startAsClient() {
   APEnabled = false;
   connectToWiFi();
-  webServer.on("/", HTTP_GET, [this]() {
-    webServer.send(200, "text/html", clientIndexHTML());
-  });
-  webServer.onNotFound(
-      [this]() { webServer.send(200, "text/html", pageNotFoundHTML()); });
+  startWebServer();
 }
 
 void ESPWiFi::startAsAccessPoint() {
@@ -78,11 +103,8 @@ void ESPWiFi::startAsAccessPoint() {
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(ip, gateway, subnet);
   WiFi.softAP(ssid, password);
-  webServer.on("/", HTTP_GET,
-               [this]() { webServer.send(200, "text/html", APIndexHTML()); });
-  webServer.onNotFound(
-      [this]() { webServer.send(200, "text/html", pageNotFoundHTML()); });
-  webServer.begin();
+  startWebServer();
+  initializeMDNS();
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 }
@@ -92,6 +114,19 @@ String ESPWiFi::MACAddressToString(uint8_t* mac) {
   snprintf(buf, sizeof(buf), "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1],
            mac[2], mac[3], mac[4], mac[5]);
   return String(buf);
+}
+
+void ESPWiFi::initializeMDNS() {
+  if (mDNSEnabled) {
+    if (!MDNS.begin(domain)) {
+      Serial.println("Error setting up MDNS responder!");
+      while (1) {
+        delay(1000);
+      }
+    } else {
+      MDNS.addService("http", "tcp", 80);
+    }
+  }
 }
 
 String ESPWiFi::infoString() {
@@ -142,3 +177,73 @@ void ESPWiFi::enableMDNS(String domainName) {
 }
 IPAddress ESPWiFi::localIP() { return WiFi.softAPIP(); }
 ESP8266WebServer* ESPWiFi::webserver() { return &webServer; }
+
+void ESPWiFi::setupAPMode() {
+  startAsAccessPoint();
+  webServer.on("/save", HTTP_POST, [this]() {
+    String ssid = webServer.arg("ssid");
+    String password = webServer.arg("password");
+    saveWiFiCredentials(ssid, password);
+    webServer.send(200, "text/plain", "Credentials saved! Rebooting...");
+    delay(1000);
+    ESP.restart();
+  });
+}
+
+void ESPWiFi::saveWiFiCredentials(const String& ssid, const String& password) {
+  LittleFS.begin();
+  File credFile = LittleFS.open("/wifi_credentials.txt", "w");
+  if (!credFile) {
+    Serial.println("Failed to open credentials file for writing");
+    return;
+  }
+  credFile.println(ssid);
+  credFile.println(password);
+  credFile.close();
+}
+
+bool ESPWiFi::loadWiFiCredentials() {
+  if (!LittleFS.begin()) {
+    Serial.println("An error occurred while mounting LittleFS");
+    return false;
+  }
+
+  File credFile = LittleFS.open("/wifi_credentials.txt", "r");
+  if (!credFile) {
+    Serial.println("Credentials file not found");
+    return false;
+  }
+
+  String ssid = credFile.readStringUntil('\n');
+  String password = credFile.readStringUntil('\n');
+  credFile.close();
+
+  ssid.trim();
+  password.trim();
+
+  if (ssid.length() > 0 && password.length() > 0) {
+    this->ssid = ssid;
+    this->password = password;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void ESPWiFi::APToClientMode() {
+  if (loadWiFiCredentials()) {
+    Serial.println("Found WiFi credentials. Connecting to WiFi...");
+    startAsClient();  // Use the saved credentials to start as a client
+  } else {
+    Serial.println("No WiFi credentials found. Starting in AP mode...");
+    setupAPMode();  // No credentials found, start in AP mode
+  }
+}
+
+void ESPWiFi::clearWiFiCredentials() {
+  // Use the file system (LittleFS or SPIFFS) to remove the credentials
+  if (LittleFS.begin()) {
+    LittleFS.remove("/wifi_credentials.txt");
+    LittleFS.end();
+  }
+}
