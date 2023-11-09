@@ -22,9 +22,9 @@ class ESPWiFi {
   IPAddress gateway;
   ESP8266WebServer webServer;
   void (*connectSubroutine)();
-  const unsigned long wifiCheckInterval = 60000;  // Check every 60 seconds
   void initializeMDNS();
   void startWebServer();
+  const unsigned long wifiCheckInterval = 60000;  // Check every 60 seconds
 
  public:
   ESPWiFi(String defaultSSID, String defaultPassword);

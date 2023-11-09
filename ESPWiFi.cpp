@@ -85,7 +85,7 @@ void ESPWiFi::startWebServer() {
     clearWiFiCredentials();
     webServer.send(
         200, "text/html",
-        "<p>WiFi settings have been erased. Please restart the device.</p>");
+        "<p>WiFi settings have been erased. Device will restart.</p>");
     // Optionally, you can also restart the ESP automatically
     ESP.restart();
   });
