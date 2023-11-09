@@ -55,10 +55,10 @@ espWiFi.runMillis(1000, []() {  // print info every second
 }
 ```
 
-License
+## License
 The library is released under the MIT License.
 
-Support
+## Support
 For support and feature requests, Open a GitHub Issue.
 
 
