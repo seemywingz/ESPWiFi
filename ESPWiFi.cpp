@@ -59,6 +59,9 @@ void ESPWiFi::startWebServer() {
     });
   }
 
+  webServer.on("/boardinfo", HTTP_GET,
+               [this]() { webServer.send(200, "text/html", boardInfoHTML()); });
+
   webServer.on("/setup", HTTP_GET,
                [this]() { webServer.send(200, "text/html", setupPageHTML()); });
 
