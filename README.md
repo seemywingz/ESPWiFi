@@ -53,6 +53,7 @@ espWiFi.runMillis(1000, []() {  // print info every second
  Serial.println(espWiFi.infoString());
 });
 }
+```
 Additional Examples.
 
 License
