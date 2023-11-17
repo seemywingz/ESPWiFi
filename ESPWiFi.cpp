@@ -49,6 +49,33 @@ void ESPWiFi::connectToWiFi() {
   Serial.print("Connected to WiFi Network: ");
 }
 
+void ESPWiFi::Start() {
+  if (loadWiFiCredentials()) {
+    Serial.println("Found WiFi credentials. Connecting to WiFi...");
+    startAsClient();  // Use the saved credentials to start as a client
+  } else {
+    Serial.println("No WiFi credentials found. Starting in AP mode...");
+    startAsAccessPoint();  // No credentials found, start in AP mode
+  }
+}
+
+void ESPWiFi::startAsClient() {
+  APEnabled = false;
+  connectToWiFi();
+  startWebServer();
+}
+
+void ESPWiFi::startAsAccessPoint() {
+  APEnabled = true;
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(ip, gateway, subnet);
+  WiFi.softAP(ssid, password);
+  startWebServer();
+  initializeMDNS();
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+}
+
 void ESPWiFi::startWebServer() {
   if (!LittleFS.begin()) {
     Serial.println("An error occurred while mounting LittleFS");
@@ -96,27 +123,39 @@ void ESPWiFi::startWebServer() {
     // Optionally, you can also restart the ESP automatically
     ESP.restart();
   });
-  webServer.onNotFound(
-      [this]() { webServer.send(200, "text/html", pageNotFoundHTML()); });
+
+  // Generic handler for all file requests
+  webServer.onNotFound([this]() {
+    String path = webServer.uri();
+    if (LittleFS.exists(path)) {
+      File file = LittleFS.open(path, "r");
+      String contentType =
+          getContentType(path);  // Determine the file's MIME type
+      webServer.streamFile(file, contentType);
+      file.close();
+    } else {
+      webServer.send(200, "text/html", pageNotFoundHTML());
+    }
+  });
 
   webServer.begin();
 }
 
-void ESPWiFi::startAsClient() {
-  APEnabled = false;
-  connectToWiFi();
-  startWebServer();
-}
-
-void ESPWiFi::startAsAccessPoint() {
-  APEnabled = true;
-  WiFi.mode(WIFI_AP);
-  WiFi.softAPConfig(ip, gateway, subnet);
-  WiFi.softAP(ssid, password);
-  startWebServer();
-  initializeMDNS();
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
+String ESPWiFi::getContentType(String filename) {
+  if (filename.endsWith(".html"))
+    return "text/html";
+  else if (filename.endsWith(".css"))
+    return "text/css";
+  else if (filename.endsWith(".js"))
+    return "application/javascript";
+  else if (filename.endsWith(".png"))
+    return "image/png";
+  else if (filename.endsWith(".jpg"))
+    return "image/jpeg";
+  else if (filename.endsWith(".gif"))
+    return "image/gif";
+  // Add more MIME types here as needed
+  return "text/plain";
 }
 
 String ESPWiFi::MACAddressToString(uint8_t* mac) {
@@ -188,20 +227,8 @@ void ESPWiFi::enableMDNS(String domainName) {
 IPAddress ESPWiFi::localIP() { return WiFi.softAPIP(); }
 ESP8266WebServer* ESPWiFi::webserver() { return &webServer; }
 
-void ESPWiFi::setupAPMode() {
-  startAsAccessPoint();
-  webServer.on("/save", HTTP_POST, [this]() {
-    String ssid = webServer.arg("ssid");
-    String password = webServer.arg("password");
-    saveWiFiCredentials(ssid, password);
-    webServer.send(200, "text/plain", "Credentials saved! Rebooting...");
-    delay(1000);
-    ESP.restart();
-  });
-}
-
 void ESPWiFi::saveWiFiCredentials(const String& ssid, const String& password) {
-  File credFile = LittleFS.open("/wifi_credentials.txt", "w");
+  File credFile = LittleFS.open(wifiCredentialsPath, "w");
   if (!credFile) {
     Serial.println("Failed to open credentials file for writing");
     return;
@@ -217,7 +244,7 @@ bool ESPWiFi::loadWiFiCredentials() {
     return false;
   }
 
-  File credFile = LittleFS.open("/wifi_credentials.txt", "r");
+  File credFile = LittleFS.open(wifiCredentialsPath, "r");
   if (!credFile) {
     Serial.println("Credentials file not found");
     return false;
@@ -239,20 +266,10 @@ bool ESPWiFi::loadWiFiCredentials() {
   }
 }
 
-void ESPWiFi::APToClientMode() {
-  if (loadWiFiCredentials()) {
-    Serial.println("Found WiFi credentials. Connecting to WiFi...");
-    startAsClient();  // Use the saved credentials to start as a client
-  } else {
-    Serial.println("No WiFi credentials found. Starting in AP mode...");
-    setupAPMode();  // No credentials found, start in AP mode
-  }
-}
-
 void ESPWiFi::clearWiFiCredentials() {
   // Use the file system (LittleFS or SPIFFS) to remove the credentials
   if (LittleFS.begin()) {
-    LittleFS.remove("/wifi_credentials.txt");
+    LittleFS.remove(wifiCredentialsPath);
     LittleFS.end();
   }
 }

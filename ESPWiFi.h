@@ -27,6 +27,8 @@ class ESPWiFi {
   const unsigned long wifiCheckInterval = 60000;  // Check every 60 seconds
 
  public:
+  String indexHTMLPath = "/index.html";
+  String wifiCredentialsPath = "/wifi_credentials.txt";
   ESPWiFi(String defaultSSID, String defaultPassword);
   ESPWiFi(String defaultSSID, String defaultPassword, IPAddress customIP);
   ESPWiFi(String defaultSSID, String defaultPassword, IPAddress customIP,
@@ -35,6 +37,7 @@ class ESPWiFi {
   void saveWiFiCredentials(const String& ssid, const String& password);
   void setConnectSubroutine(void (*subroutine)());
   String MACAddressToString(uint8_t* mac);
+  String getContentType(String filename);
   void enableMDNS(String domainName);
   String eraseCredentialsPageHTML();
   ESP8266WebServer* webserver();
@@ -46,7 +49,6 @@ class ESPWiFi {
   String clientIndexHTML();
   String setupPageHTML();
   String boardInfoHTML();
-  void APToClientMode();
   String APIndexHTML();
   void connectToWiFi();
   void startAsClient();
@@ -55,6 +57,7 @@ class ESPWiFi {
   String infoString();
   void checkWiFi();
   void setupAPMode();
+  void Start();
 };
 
 #endif
