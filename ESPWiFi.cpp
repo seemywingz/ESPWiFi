@@ -50,14 +50,21 @@ void ESPWiFi::connectToWiFi() {
 }
 
 void ESPWiFi::startWebServer() {
-  if (APEnabled) {
-    webServer.on("/", HTTP_GET,
-                 [this]() { webServer.send(200, "text/html", APIndexHTML()); });
-  } else {
-    webServer.on("/", HTTP_GET, [this]() {
-      webServer.send(200, "text/html", clientIndexHTML());
-    });
+  if (!LittleFS.begin()) {
+    Serial.println("An error occurred while mounting LittleFS");
   }
+
+  webServer.on("/", HTTP_GET, [this]() {
+    File file = LittleFS.open("/index.html", "r");
+    if (file) {
+      webServer.streamFile(file, "text/html");
+      file.close();
+    } else if (APEnabled) {
+      webServer.send(200, "text/html", APIndexHTML());
+    } else {
+      webServer.send(200, "text/html", clientIndexHTML());
+    }
+  });
 
   webServer.on("/boardinfo", HTTP_GET,
                [this]() { webServer.send(200, "text/html", boardInfoHTML()); });
@@ -194,7 +201,6 @@ void ESPWiFi::setupAPMode() {
 }
 
 void ESPWiFi::saveWiFiCredentials(const String& ssid, const String& password) {
-  LittleFS.begin();
   File credFile = LittleFS.open("/wifi_credentials.txt", "w");
   if (!credFile) {
     Serial.println("Failed to open credentials file for writing");
