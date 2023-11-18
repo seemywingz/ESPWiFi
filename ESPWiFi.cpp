@@ -25,30 +25,6 @@ ESPWiFi::ESPWiFi(String ssid, String password, IPAddress ip, IPAddress gateway,
   this->password = password;
 }
 
-void ESPWiFi::connectToWiFi() {
-  Serial.print("Connecting to WiFi...");
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  pinMode(LED_BUILTIN, OUTPUT);
-  while (WiFi.status() != WL_CONNECTED) {
-    if (connectSubroutine != NULL) {
-      connectSubroutine();
-    } else {
-      digitalWrite(LED_BUILTIN, LOW);
-      delay(500);
-      digitalWrite(LED_BUILTIN, HIGH);
-      delay(500);
-    }
-  }
-  initializeMDNS();
-  ip = WiFi.localIP();
-  gateway = WiFi.gatewayIP();
-  subnet = WiFi.subnetMask();
-  Serial.println(infoString());
-  analogWrite(LED_BUILTIN, 255 / 2);
-  Serial.print("Connected to WiFi Network: ");
-}
-
 void ESPWiFi::Start() {
   if (loadWiFiCredentials()) {
     Serial.println("Found WiFi credentials. Connecting to WiFi...");
@@ -63,6 +39,7 @@ void ESPWiFi::startAsClient() {
   APEnabled = false;
   connectToWiFi();
   startWebServer();
+  initializeMDNS();
 }
 
 void ESPWiFi::startAsAccessPoint() {
@@ -139,6 +116,26 @@ void ESPWiFi::startWebServer() {
   });
 
   webServer.begin();
+}
+
+void ESPWiFi::connectToWiFi() {
+  // WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  pinMode(LED_BUILTIN, OUTPUT);
+  while (WiFi.status() != WL_CONNECTED) {
+    if (connectSubroutine != NULL) {
+      connectSubroutine();
+    } else {
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(500);
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(500);
+    }
+  }
+  ip = WiFi.localIP();
+  gateway = WiFi.gatewayIP();
+  subnet = WiFi.subnetMask();
+  analogWrite(LED_BUILTIN, LOW);
 }
 
 String ESPWiFi::getContentType(String filename) {
@@ -261,9 +258,9 @@ bool ESPWiFi::loadWiFiCredentials() {
     this->ssid = ssid;
     this->password = password;
     return true;
-  } else {
-    return false;
   }
+
+  return false;
 }
 
 void ESPWiFi::clearWiFiCredentials() {

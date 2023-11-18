@@ -28,7 +28,7 @@ class ESPWiFi {
 
  public:
   String indexHTMLPath = "/index.html";
-  String wifiCredentialsPath = "/wifi_credentials.txt";
+  String wifiCredentialsPath = "/wifi-credentials.txt";
   ESPWiFi(String defaultSSID, String defaultPassword);
   ESPWiFi(String defaultSSID, String defaultPassword, IPAddress customIP);
   ESPWiFi(String defaultSSID, String defaultPassword, IPAddress customIP,
