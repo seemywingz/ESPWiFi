@@ -240,7 +240,6 @@ void ESPWiFi::enableMDNS(String domainName) {
   mDNSEnabled = true;
 }
 IPAddress ESPWiFi::localIP() { return WiFi.softAPIP(); }
-// ESP8266WebServer* ESPWiFi::webserver() { return &webServer; }
 
 void ESPWiFi::saveWiFiCredentials(const String& ssid, const String& password) {
   File credFile = LittleFS.open(wifiCredentialsFile, "w");
@@ -282,7 +281,6 @@ bool ESPWiFi::loadWiFiCredentials() {
 }
 
 void ESPWiFi::clearWiFiCredentials() {
-  // Use the file system (LittleFS or SPIFFS) to remove the credentials
   if (LittleFS.begin()) {
     LittleFS.remove(wifiCredentialsFile);
     LittleFS.end();
