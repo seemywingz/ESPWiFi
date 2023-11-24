@@ -20,13 +20,13 @@ class ESPWiFi {
   IPAddress ip;
   IPAddress subnet;
   IPAddress gateway;
-  ESP8266WebServer webServer;
   void (*connectSubroutine)();
   void initializeMDNS();
   void startWebServer();
   const unsigned long wifiCheckInterval = 60000;  // Check every 60 seconds
 
  public:
+  ESP8266WebServer webServer;
   String indexHTMLPath = "/index.html";
   String wifiCredentialsPath = "/wifi-credentials.txt";
   ESPWiFi(String defaultSSID, String defaultPassword);
@@ -40,7 +40,6 @@ class ESPWiFi {
   String getContentType(String filename);
   void enableMDNS(String domainName);
   String eraseCredentialsPageHTML();
-  ESP8266WebServer* webserver();
   void clearWiFiCredentials();
   bool loadWiFiCredentials();
   void startAsAccessPoint();

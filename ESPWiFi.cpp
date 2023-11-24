@@ -222,7 +222,7 @@ void ESPWiFi::enableMDNS(String domainName) {
   mDNSEnabled = true;
 }
 IPAddress ESPWiFi::localIP() { return WiFi.softAPIP(); }
-ESP8266WebServer* ESPWiFi::webserver() { return &webServer; }
+// ESP8266WebServer* ESPWiFi::webserver() { return &webServer; }
 
 void ESPWiFi::saveWiFiCredentials(const String& ssid, const String& password) {
   File credFile = LittleFS.open(wifiCredentialsPath, "w");
