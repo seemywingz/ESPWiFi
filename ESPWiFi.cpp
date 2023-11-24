@@ -29,6 +29,7 @@ void ESPWiFi::Start() {
   if (loadWiFiCredentials()) {
     Serial.println("Found WiFi credentials. Connecting to WiFi...");
     startAsClient();  // Use the saved credentials to start as a client
+    checkWiFiStartup();
   } else {
     Serial.println("No WiFi credentials found. Starting in AP mode...");
     startAsAccessPoint();  // No credentials found, start in AP mode
@@ -119,12 +120,13 @@ void ESPWiFi::startWebServer() {
 }
 
 void ESPWiFi::connectToWiFi() {
-  // WiFi.mode(WIFI_STA);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   pinMode(LED_BUILTIN, OUTPUT);
   while (WiFi.status() != WL_CONNECTED) {
     if (connectSubroutine != NULL) {
       connectSubroutine();
+      checkWiFiStartup();
     } else {
       digitalWrite(LED_BUILTIN, LOW);
       delay(500);
@@ -136,6 +138,34 @@ void ESPWiFi::connectToWiFi() {
   gateway = WiFi.gatewayIP();
   subnet = WiFi.subnetMask();
   analogWrite(LED_BUILTIN, LOW);
+}
+
+void ESPWiFi::checkWiFiStartup() {
+  if (WiFi.status() != WL_CONNECTED) {
+    oncePerMillis(wifiCheckInterval, [this]() {
+      connectionRestarts = loadConnectionAttempts();
+      saveConnectionAttempts(++connectionRestarts);
+      if (connectionRestarts >= maxConnectionRestarts) {
+        clearWiFiCredentials();
+        saveConnectionAttempts(connectionRestarts = 0);
+        ESP.restart();
+      }
+    });
+  } else {
+    saveConnectionAttempts(connectionRestarts = 0);
+  }
+}
+
+void ESPWiFi::checkWiFi() {
+  if (APEnabled) {
+    return;
+  }
+  oncePerMillis(wifiCheckInterval, [this]() {
+    if (WiFi.status() != WL_CONNECTED) {
+      Serial.println("Lost Wi-Fi connection. Reconnecting...");
+      connectToWiFi();
+    }
+  });
 }
 
 String ESPWiFi::getContentType(String filename) {
@@ -185,24 +215,12 @@ String ESPWiFi::infoString() {
   return infoString;
 }
 
-void ESPWiFi::runMillis(unsigned long m, std::function<void()> callback) {
+void ESPWiFi::oncePerMillis(unsigned long m, std::function<void()> callback) {
   static unsigned long lastTime = 0;
   if (millis() - lastTime >= m) {
     lastTime = millis();
     callback();
   }
-}
-
-void ESPWiFi::checkWiFi() {
-  if (APEnabled) {
-    return;
-  }
-  runMillis(1000, [this]() {
-    if (WiFi.status() != WL_CONNECTED) {
-      Serial.println("Lost Wi-Fi connection. Reconnecting...");
-      connectToWiFi();
-    }
-  });
 }
 
 void ESPWiFi::setConnectSubroutine(void (*subroutine)()) {
@@ -269,4 +287,29 @@ void ESPWiFi::clearWiFiCredentials() {
     LittleFS.remove(wifiCredentialsFile);
     LittleFS.end();
   }
+}
+
+void ESPWiFi::saveConnectionAttempts(int attempts) {
+  File file = LittleFS.open(connectionAttemptsFile, "w");
+  if (!file) {
+    Serial.println("Failed to open file for writing");
+    return;
+  }
+  file.println(attempts);
+  file.close();
+}
+
+int ESPWiFi::loadConnectionAttempts() {
+  if (!LittleFS.begin()) {
+    Serial.println("An error occurred while mounting LittleFS");
+    return 0;
+  }
+  File file = LittleFS.open(connectionAttemptsFile, "r");
+  if (!file) {
+    Serial.println("Connection attempts file not found");
+    return 0;
+  }
+  int attempts = file.readStringUntil('\n').toInt();
+  file.close();
+  return attempts;
 }

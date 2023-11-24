@@ -9,6 +9,10 @@
 
 class ESPWiFi {
  private:
+  const unsigned long wifiCheckInterval = 6000;  // 6 seconds
+  int connectionRestarts = 0;
+  int maxConnectionRestarts = 6;
+  const String connectionAttemptsFile = "/connection-attempts";
   const String version = "0.0.1";
   String ssid;
   String domain;
@@ -20,10 +24,11 @@ class ESPWiFi {
   IPAddress ip;
   IPAddress subnet;
   IPAddress gateway;
+  void saveConnectionAttempts(int attempts);
+  int loadConnectionAttempts();
   void (*connectSubroutine)();
   void initializeMDNS();
   void startWebServer();
-  const unsigned long wifiCheckInterval = 60000;  // Check every 60 seconds
 
  public:
   ESP8266WebServer webServer;
@@ -33,7 +38,7 @@ class ESPWiFi {
   ESPWiFi(String defaultSSID, String defaultPassword, IPAddress customIP);
   ESPWiFi(String defaultSSID, String defaultPassword, IPAddress customIP,
           IPAddress customGateway, IPAddress customSubnet);
-  void runMillis(unsigned long millis, std::function<void()> callback);
+  void oncePerMillis(unsigned long millis, std::function<void()> callback);
   void saveWiFiCredentials(const String& ssid, const String& password);
   void setConnectSubroutine(void (*subroutine)());
   String MACAddressToString(uint8_t* mac);
@@ -46,6 +51,7 @@ class ESPWiFi {
   String pageNotFoundHTML();
   String sharedHTMLStyle();
   String clientIndexHTML();
+  void checkWiFiStartup();
   String setupPageHTML();
   String boardInfoHTML();
   String APIndexHTML();
