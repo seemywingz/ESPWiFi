@@ -27,8 +27,8 @@ class ESPWiFi {
 
  public:
   ESP8266WebServer webServer;
-  String indexHTMLPath = "/index.html";
-  String wifiCredentialsPath = "/wifi-credentials.txt";
+  String indexHTMLFile = "/index.html";
+  String wifiCredentialsFile = "/wifi-credentials.txt";
   ESPWiFi(String defaultSSID, String defaultPassword);
   ESPWiFi(String defaultSSID, String defaultPassword, IPAddress customIP);
   ESPWiFi(String defaultSSID, String defaultPassword, IPAddress customIP,

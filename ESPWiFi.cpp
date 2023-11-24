@@ -225,7 +225,7 @@ IPAddress ESPWiFi::localIP() { return WiFi.softAPIP(); }
 // ESP8266WebServer* ESPWiFi::webserver() { return &webServer; }
 
 void ESPWiFi::saveWiFiCredentials(const String& ssid, const String& password) {
-  File credFile = LittleFS.open(wifiCredentialsPath, "w");
+  File credFile = LittleFS.open(wifiCredentialsFile, "w");
   if (!credFile) {
     Serial.println("Failed to open credentials file for writing");
     return;
@@ -241,7 +241,7 @@ bool ESPWiFi::loadWiFiCredentials() {
     return false;
   }
 
-  File credFile = LittleFS.open(wifiCredentialsPath, "r");
+  File credFile = LittleFS.open(wifiCredentialsFile, "r");
   if (!credFile) {
     Serial.println("Credentials file not found");
     return false;
@@ -266,7 +266,7 @@ bool ESPWiFi::loadWiFiCredentials() {
 void ESPWiFi::clearWiFiCredentials() {
   // Use the file system (LittleFS or SPIFFS) to remove the credentials
   if (LittleFS.begin()) {
-    LittleFS.remove(wifiCredentialsPath);
+    LittleFS.remove(wifiCredentialsFile);
     LittleFS.end();
   }
 }
