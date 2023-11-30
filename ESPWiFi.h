@@ -10,10 +10,13 @@
 class ESPWiFi {
  private:
   const unsigned long wifiCheckInterval = 6000;  // 6 seconds
+  int channel;
+  int hidden = 0;
+  int maxConnections = 6;
   int connectionRestarts = 0;
   int maxConnectionRestarts = 6;
-  const String connectionAttemptsFile = "/connection-attempts";
   const String version = "0.0.1";
+  const String connectionAttemptsFile = "/connection-attempts";
   String ssid;
   String domain;
   String password;
@@ -29,6 +32,8 @@ class ESPWiFi {
   void (*connectSubroutine)();
   void initializeMDNS();
   void startWebServer();
+  int countNetworksOnChannel(int channel);
+  int findBestChannel();
 
  public:
   ESP8266WebServer webServer;
@@ -61,7 +66,7 @@ class ESPWiFi {
   void handleClient();
   String infoString();
   void checkWiFi();
-  void Start();
+  void start();
 };
 
 #endif

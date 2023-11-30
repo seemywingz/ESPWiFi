@@ -25,7 +25,7 @@ ESPWiFi::ESPWiFi(String ssid, String password, IPAddress ip, IPAddress gateway,
   this->password = password;
 }
 
-void ESPWiFi::Start() {
+void ESPWiFi::start() {
   if (loadWiFiCredentials()) {
     Serial.println("Found WiFi credentials. Connecting to WiFi...");
     startAsClient();  // Use the saved credentials to start as a client
@@ -46,12 +46,39 @@ void ESPWiFi::startAsClient() {
 void ESPWiFi::startAsAccessPoint() {
   APEnabled = true;
   WiFi.mode(WIFI_AP);
+  WiFi.setSleepMode(WIFI_NONE_SLEEP);
   WiFi.softAPConfig(ip, gateway, subnet);
-  WiFi.softAP(ssid, password);
+  // WiFi.softAP(ssid, password);
+  channel = findBestChannel();
+  WiFi.softAP(ssid, password, channel, hidden, maxConnections);
   startWebServer();
   initializeMDNS();
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
+}
+
+int ESPWiFi::findBestChannel() {
+  int bestChannel = 1;
+  int minNetworksOnChannel = INT_MAX;
+  for (int ch = 1; ch <= 13; ++ch) {
+    int networksOnChannel = countNetworksOnChannel(ch);
+    if (networksOnChannel < minNetworksOnChannel) {
+      bestChannel = ch;
+      minNetworksOnChannel = networksOnChannel;
+    }
+  }
+  return bestChannel;
+}
+
+int ESPWiFi::countNetworksOnChannel(int channel) {
+  int numNetworks = WiFi.scanNetworks();
+  int count = 0;
+  for (int i = 0; i < numNetworks; ++i) {
+    if (WiFi.channel(i) == channel) {
+      count++;
+    }
+  }
+  return count;
 }
 
 void ESPWiFi::startWebServer() {
