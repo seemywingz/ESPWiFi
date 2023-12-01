@@ -9,14 +9,14 @@
 
 class ESPWiFi {
  private:
-  const unsigned long wifiCheckInterval = 6000;  // 6 seconds
-  int channel;
   int hidden = 0;
-  int maxConnections = 6;
+  int channel = 3;
+  int maxConnections = 9;
   int connectionRestarts = 0;
   int maxConnectionRestarts = 6;
   const String version = "0.0.1";
   const String connectionAttemptsFile = "/connection-attempts";
+  const unsigned long wifiCheckInterval = 30000;  // 30 seconds
   String ssid;
   String domain;
   String password;
