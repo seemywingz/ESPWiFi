@@ -1,0 +1,6 @@
+{
+    "board": "esp8266:esp8266:nodemcuv2",
+    "sketch": "arduino/led_matrix_game_of_life/led_matrix_game_of_life.ino",
+    "output": ".arduino/output",
+    "programmer": "avrisp"
+}
