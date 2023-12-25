@@ -27,11 +27,11 @@ ESPWiFi::ESPWiFi(String ssid, String password, IPAddress ip, IPAddress gateway,
 
 void ESPWiFi::start() {
   if (loadWiFiCredentials()) {
-    Serial.println("Found WiFi credentials. Connecting to WiFi...");
+    Serial.print("Found WiFi credentials. Connecting to WiFi...");
     startAsClient();  // Use the saved credentials to start as a client
     checkWiFiStartup();
   } else {
-    Serial.println("No WiFi credentials found. Starting in AP mode...");
+    Serial.print("No WiFi credentials found. Starting in AP mode...");
     startAsAccessPoint();  // No credentials found, start in AP mode
   }
 }
