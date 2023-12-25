@@ -1,6 +1,5 @@
 {
-    "board": "esp8266:esp8266:nodemcuv2",
-    "sketch": "arduino/led_matrix_game_of_life/led_matrix_game_of_life.ino",
-    "output": ".arduino/output",
-    "programmer": "avrisp"
+    "board": "esp32:esp32:adafruit_qtpy_esp32c3",
+    "port": "/dev/tty.usbmodem141401",
+    "configuration": "CDCOnBoot=cdc,PartitionScheme=default,CPUFreq=160,FlashMode=qio,FlashFreq=80,FlashSize=4M,UploadSpeed=921600,DebugLevel=none,EraseFlash=none"
 }
