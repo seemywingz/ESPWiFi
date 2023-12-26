@@ -6,6 +6,7 @@
 #include <LittleFS.h>
 #include <WebServer.h>
 #include <WiFi.h>
+#include <esp_wifi.h>
 
 class ESPWiFi {
  private:

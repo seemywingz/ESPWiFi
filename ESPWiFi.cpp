@@ -46,15 +46,15 @@ void ESPWiFi::startAsClient() {
 void ESPWiFi::startAsAccessPoint() {
   APEnabled = true;
   WiFi.mode(WIFI_AP);
-  WiFi.setSleepMode(WIFI_NONE_SLEEP);
+  WiFi.setSleep(false);
   WiFi.softAPConfig(ip, gateway, subnet);
   // WiFi.softAP(ssid, password);
   channel = findBestChannel();
   WiFi.softAP(ssid, password, channel, hidden, maxConnections);
   startWebServer();
   initializeMDNS();
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
+  // pinMode(LED_BUILTIN, OUTPUT);
+  // digitalWrite(LED_BUILTIN, LOW);
 }
 
 int ESPWiFi::findBestChannel() {
@@ -149,22 +149,22 @@ void ESPWiFi::startWebServer() {
 void ESPWiFi::connectToWiFi() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  pinMode(LED_BUILTIN, OUTPUT);
+  // pinMode(LED_BUILTIN, OUTPUT);
   while (WiFi.status() != WL_CONNECTED) {
     if (connectSubroutine != NULL) {
       connectSubroutine();
       checkWiFiStartup();
     } else {
-      digitalWrite(LED_BUILTIN, LOW);
+      // digitalWrite(LED_BUILTIN, LOW);
       delay(500);
-      digitalWrite(LED_BUILTIN, HIGH);
-      delay(500);
+      // digitalWrite(LED_BUILTIN, HIGH);
+      // delay(500);
     }
   }
   ip = WiFi.localIP();
   gateway = WiFi.gatewayIP();
   subnet = WiFi.subnetMask();
-  analogWrite(LED_BUILTIN, LOW);
+  // analogWrite(LED_BUILTIN, LOW);
 }
 
 void ESPWiFi::checkWiFiStartup() {
@@ -256,9 +256,9 @@ void ESPWiFi::setConnectSubroutine(void (*subroutine)()) {
 
 void ESPWiFi::handleClient() {
   webServer.handleClient();
-  if (mDNSEnabled) {
-    MDNS.update();
-  }
+  // if (mDNSEnabled) {
+  //   MDNS.update();
+  // }
   checkWiFi();
 }
 

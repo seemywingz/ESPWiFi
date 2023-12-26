@@ -112,33 +112,28 @@ String ESPWiFi::APIndexHTML() {
       "<div class='info'>SSID: " + String(WiFi.softAPSSID()) + "</div>";
   indexHTML += "</div>";
 
-  unsigned char number_client = wifi_softap_get_station_num();
+  // Get the number of connected devices
+  wifi_sta_list_t stationList;
+  tcpip_adapter_sta_list_t tcpip_adapter_list;
+  esp_wifi_ap_get_sta_list(&stationList);
+  tcpip_adapter_get_sta_list(&stationList, &tcpip_adapter_list);
+
   indexHTML += "<div class='section'>";
   indexHTML += "<div class='header'>Connected Clients (" +
-               String(number_client) + ")</div>";
+               String(tcpip_adapter_list.num) + ")</div>";
 
-  if (number_client > 0) {
-    struct station_info* stat_info = wifi_softap_get_station_info();
-    unsigned char clientCounter = 1;
-
-    while (stat_info != NULL) {
-      // Client ID
-      indexHTML += "<div class='info'><strong>Client " + String(clientCounter) +
-                   "</strong></div>";
-      // Client IP address
-      String clientIP = IPAddress(stat_info->ip.addr).toString();
-      indexHTML += "<div class='info'>IP: <a href='http://" + clientIP + "'>" +
-                   clientIP + "</a></div>";
-      // Client MAC address
-      String clientMacAddress = MACAddressToString(stat_info->bssid);
-      indexHTML +=
-          "<div class='info'>MAC Address: " + clientMacAddress + "</div>";
-      stat_info = STAILQ_NEXT(stat_info, next);
-      clientCounter++;
-    }
-    wifi_softap_free_station_info();
-  } else {
-    indexHTML += "<div class='info'>No connected clients</div>";
+  for (int i = 0; i < tcpip_adapter_list.num; i++) {
+    tcpip_adapter_sta_info_t station = tcpip_adapter_list.sta[i];
+    // Client IP address
+    String clientIP = IPAddress(station.ip.addr).toString();
+    indexHTML += "<div class='info'>Client " + String(i + 1) +
+                 ": IP: " + clientIP + "</div>";
+    // Client MAC address
+    char macStr[18];
+    snprintf(macStr, sizeof(macStr), "%02X:%02X:%02X:%02X:%02X:%02X",
+             station.mac[0], station.mac[1], station.mac[2], station.mac[3],
+             station.mac[4], station.mac[5]);
+    indexHTML += "<div class='info'>MAC: " + String(macStr) + "</div>";
   }
   indexHTML += "</div>";
 
@@ -152,29 +147,41 @@ String ESPWiFi::boardInfoHTML() {
   String html = sharedHTMLStyle();
   html += "<div class='container'>";
   html += "<div class='section'>";
-  html += "<div class='header'>ESP8266 Board Details</div>";
+  html += "<div class='header'>ESP32 Board Details</div>";
   html += "<ul>";
-  html +=
-      "<li><strong>Board Type:</strong> NodeMcu Mini Wireless D1 Module "
-      "(ESP8266 ESP-12F)</li>";
-  html += "<li><strong>Firmware Version:</strong> " +
-          String(ESP.getCoreVersion()) + "</li>";
+
+  // SDK Version
   html += "<li><strong>SDK Version:</strong> " + String(ESP.getSdkVersion()) +
           "</li>";
-  html += "<li><strong>Flash Chip ID:</strong> " +
-          String(ESP.getFlashChipId(), HEX) + "</li>";
-  html += "<li><strong>Flash Chip Size:</strong> " +
-          String(ESP.getFlashChipSize() / (1024 * 1024)) + " MB</li>";
+
+  // Free Heap
   html += "<li><strong>Free Heap:</strong> " + String(ESP.getFreeHeap()) +
           " bytes</li>";
-  html +=
-      "<li><strong>Chip ID:</strong> " + String(ESP.getChipId(), HEX) + "</li>";
+
+  // Chip ID
+  uint64_t chipid =
+      ESP.getEfuseMac();  // Gets the MAC address as a 64-bit number
+  uint32_t chipid_low = chipid & 0xFFFFFFFF;
+  uint32_t chipid_high = (chipid >> 32) & 0xFFFFFFFF;
+  html += "<li><strong>Chip ID:</strong> " + String(chipid_high, HEX) +
+          String(chipid_low, HEX) + "</li>";
+
+  // CPU Frequency
   html += "<li><strong>CPU Frequency:</strong> " + String(ESP.getCpuFreqMHz()) +
           " MHz</li>";
+
+  // Flash Chip Size
+  html += "<li><strong>Flash Chip Size:</strong> " +
+          String(ESP.getFlashChipSize() / (1024 * 1024)) + " MB</li>";
+
+  // Flash Frequency
   html += "<li><strong>Flash Frequency:</strong> " +
           String(ESP.getFlashChipSpeed() / 1000000) + " MHz</li>";
+
+  // Flash Mode
   html += "<li><strong>Flash Mode:</strong> " + String(ESP.getFlashChipMode()) +
           "</li>";
+
   html += "</ul>";
   html += "</div></div>";
   return html;
