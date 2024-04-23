@@ -110,6 +110,8 @@ class ESPWiFi {
       return "application/x-zip";
     else if (filename.endsWith(".gz"))
       return "application/x-gzip";
+    else if (filename.endsWith(".mp3"))
+      return "audio/mpeg";
     // Add more MIME types here as needed
     return "text/plain";
   }
