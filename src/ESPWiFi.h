@@ -3,11 +3,21 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+
+#ifdef ESP8266
+#include <ESP8266HTTPClient.h>
+#include <ESP8266WebServer.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#define WebServer ESP8266WebServer
+#else
 #include <ESPmDNS.h>
 #include <HTTPClient.h>
-#include <LittleFS.h>
 #include <WebServer.h>
 #include <WiFi.h>
+#endif
+
+#include <LittleFS.h>
 #include <WiFiClient.h>
 
 class ESPWiFi {
@@ -194,7 +204,11 @@ class ESPWiFi {
   void defaultConfig() {
     Serial.println("Using default config");
     config["mode"] = "ap";
+#ifdef ESP8266
+    config["ap"]["ssid"] = "ESPWiFi-" + String(ESP.getChipId(), HEX);
+#else
     config["ap"]["ssid"] = "ESPWiFi-" + String(ESP.getEfuseMac(), HEX);
+#endif
     config["ap"]["password"] = "abcd1234";
     config["mdns"] = "esp32";
     config["client"]["ssid"] = "";
