@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.conf": "bat",
+        "*.ino": "cpp",
+        "string": "cpp"
+    }
+}

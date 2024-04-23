@@ -1,6 +1,8 @@
 {
-    "port": "/dev/tty.usbmodem141301",
-    "configuration": "JTAGAdapter=default,CDCOnBoot=cdc,PartitionScheme=no_ota,CPUFreq=160,FlashMode=qio,FlashFreq=80,FlashSize=4M,UploadSpeed=115200,DebugLevel=none,EraseFlash=none",
     "board": "esp32:esp32:esp32c3",
-    "programmer": "esptool"
+    "port": "/dev/tty.usbmodem141301",
+    "output": ".arduino",
+    "sketch": "ESPWiFi.ino",
+    "programmer": "esptool",
+    "configuration": "JTAGAdapter=default,CDCOnBoot=cdc,PartitionScheme=no_ota,CPUFreq=160,FlashMode=qio,FlashFreq=80,FlashSize=4M,UploadSpeed=115200,DebugLevel=none,EraseFlash=none"
 }
