@@ -15,5 +15,4 @@ void loop() {
     String response = wifi.openAIChat("Hello, world!");
     wifi.openAI_TTS(response, "/hello.mp3");
   }
-  delay(10);
 }
