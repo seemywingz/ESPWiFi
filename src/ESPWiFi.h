@@ -3,20 +3,30 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+
+#ifdef ESP8266
+#include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
-#include <LittleFS.h>
+#define WebServer ESP8266WebServer
+#else
+#include <ESPmDNS.h>
+#include <HTTPClient.h>
+#include <WebServer.h>
+#include <WiFi.h>
+#endif
 
-#include "Utils.h"
+#include <LittleFS.h>
+#include <WiFiClient.h>
+
 class ESPWiFi {
  public:
   DynamicJsonDocument config = DynamicJsonDocument(256);
 
   String configFile = "/config.json";
-  String openAI_URL = "https://api.openai.com/v1/";
 
-  ESP8266WebServer webServer;
+  WebServer webServer;
 
   int maxConnectAttempts = 120;
 
@@ -87,135 +97,19 @@ class ESPWiFi {
     Serial.println(WiFi.softAPIP());
   }
 
-  String getContentType(String filename) {
-    if (filename.endsWith(".html"))
-      return "text/html";
-    else if (filename.endsWith(".css"))
-      return "text/css";
-    else if (filename.endsWith(".js"))
-      return "application/javascript";
-    else if (filename.endsWith(".png"))
-      return "image/png";
-    else if (filename.endsWith(".jpg"))
-      return "image/jpeg";
-    else if (filename.endsWith(".gif"))
-      return "image/gif";
-    else if (filename.endsWith(".ico"))
-      return "image/x-icon";
-    else if (filename.endsWith(".xml"))
-      return "text/xml";
-    else if (filename.endsWith(".pdf"))
-      return "application/x-pdf";
-    else if (filename.endsWith(".zip"))
-      return "application/x-zip";
-    else if (filename.endsWith(".gz"))
-      return "application/x-gzip";
-    else if (filename.endsWith(".mp3"))
-      return "audio/mpeg";
-    // Add more MIME types here as needed
-    return "text/plain";
-  }
+  void handleClient() { webServer.handleClient(); }
 
-  void handleClient() {
-    webServer.handleClient();
-    MDNS.update();
-  }
+  // Utils
+  String getContentType(String filename);
+  String getFileExtension(const String& filename);
+  String makeHTTPSRequest(const String& method, const String& url,
+                          const String& token = "",
+                          const String& contentType = "",
+                          const String& payload = "");
 
-  String openAIChat(String text) {
-    if (config["openAI"]["apiKey"] == "") {
-      Serial.println("OpenAI key not set");
-      return "";
-    }
-
-    String url = openAI_URL + "chat/completions";
-
-    // Prepare the JSON payload
-    DynamicJsonDocument doc(512);
-    doc["model"] = "gpt-4-turbo-preview";
-    doc["messages"] = JsonArray();
-    doc["messages"].add(JsonObject());
-    doc["messages"][0]["role"] = "system";
-    doc["messages"][0]["content"] =
-        config["openAI"]["system_message"].as<String>()
-            ? config["openAI"]["system_message"].as<String>()
-            : "You are a helpful assistant.";
-    doc["messages"].add(JsonObject());
-    doc["messages"][1]["role"] = "user";
-    doc["messages"][1]["content"] = text;
-    doc["max_tokens"] = 100;
-    String payload;
-    serializeJson(doc, payload);
-    String contentType = "application/json";
-
-    // Make the request
-    String response = makeHTTPSRequest("POST", url, config["openAI"]["apiKey"],
-                                       contentType, payload);
-
-    DynamicJsonDocument resDoc(512);
-    deserializeJson(resDoc, response);
-    if (resDoc["choices"][0]["message"]["content"].is<String>()) {
-      return resDoc["choices"][0]["message"]["content"].as<String>();
-    } else {
-      return "Error parsing response";
-    }
-
-    return "Sorry, I didn't understand that. Please try again.";
-  }
-
-  void openAI_TTS(String text, String filePath) {
-    if (config["openAI"]["apiKey"] == "") {
-      Serial.println("OpenAI key not set,");
-      return;
-    }
-
-    String url = openAI_URL + "audio/speech";
-    String extension = getFileExtension(filePath);
-
-    // Prepare the JSON payload
-    DynamicJsonDocument doc(512);
-    doc["model"] = "tts-1";
-    doc["input"] = text;
-    doc["voice"] = config["openAI"]["voice"].as<String>();
-    doc["response_format"] = extension;
-
-    String payload;
-    serializeJson(doc, payload);
-
-    // Configure the secure client and make the request
-    WiFiClientSecure client;
-    client.setInsecure();  // Disable certificate verification (not recommended
-                           // for production)
-    HTTPClient http;
-    http.begin(client, url);
-
-    // Set headers
-    http.addHeader("Content-Type", "application/json");
-    http.addHeader("Authorization",
-                   "Bearer " + config["openAI"]["apiKey"].as<String>());
-
-    int httpCode = http.POST(payload);
-
-    if (httpCode == HTTP_CODE_OK) {
-      // Open the file for writing in binary mode
-      Serial.println("OpenAI TTS request successful, writing to file...");
-      File file = LittleFS.open(filePath, "w+");
-      if (!file) {
-        Serial.println("Failed to open file for writing");
-        http.end();  // End the connection
-        return;
-      }
-
-      // Stream the response into the file
-      http.writeToStream(&file);
-      file.close();
-      Serial.println("File written successfully");
-    } else {
-      Serial.print("HTTP POST failed, error: ");
-      Serial.println(http.errorToString(httpCode).c_str());
-    }
-
-    http.end();
-  }
+  // OpenAI
+  String openAIChat(String text);
+  void openAI_TTS(String text, String filePath);
 
  private:
   void startMDNS() {
@@ -310,7 +204,11 @@ class ESPWiFi {
   void defaultConfig() {
     Serial.println("Using default config");
     config["mode"] = "ap";
-    config["ap"]["ssid"] = "ESP32-" + String(ESP.getChipId(), HEX);
+#ifdef ESP8266
+    config["ap"]["ssid"] = "ESPWiFi-" + String(ESP.getChipId(), HEX);
+#else
+    config["ap"]["ssid"] = "ESPWiFi-" + String(ESP.getEfuseMac(), HEX);
+#endif
     config["ap"]["password"] = "abcd1234";
     config["mdns"] = "esp32";
     config["client"]["ssid"] = "";
