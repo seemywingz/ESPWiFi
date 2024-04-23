@@ -97,7 +97,12 @@ class ESPWiFi {
     Serial.println(WiFi.softAPIP());
   }
 
-  void handleClient() { webServer.handleClient(); }
+  void handleClient() {
+    webServer.handleClient();
+#ifdef ESP8266
+    MDNS.update();
+#endif
+  }
 
   // Utils
   String getContentType(String filename);
