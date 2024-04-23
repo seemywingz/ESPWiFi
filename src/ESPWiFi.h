@@ -10,15 +10,16 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #define WebServer ESP8266WebServer
+#include <LittleFS.h>
+#include <WiFiClient.h>
 #else
 #include <ESPmDNS.h>
 #include <HTTPClient.h>
+#include <LittleFS.h>
 #include <WebServer.h>
 #include <WiFi.h>
-#endif
-
-#include <LittleFS.h>
 #include <WiFiClient.h>
+#endif
 
 class ESPWiFi {
  public:
