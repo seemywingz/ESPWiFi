@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="style.css">
+        <title>ESPWiFi</title>
+        <link rel="icon" href="favicon.ico" type="image/x-icon">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <div class="container"> <!-- ESPWiFi -->
+            <label class="header"> ESPWiFi </label>
+            <div class="setting">
+
+                <div class="setting"> <!-- Settings Options -->
+                    <select id="settingSelect"
+                        class="clickable">
+                        <option value="about">About</option>
+                        <option value="wifi"> WiFi</option>
+                        <option value="ap">AP</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="mode">Mode</option>
+                        <option value="files">Files</option>
+                    </select>
+                </div>
+
+                <div class="toggle-content" id="wifi-settings"><!-- WiFi -->
+                    <div class="setting">
+                        <label>SSID</label>
+                        <input id="wifiSSID" type="text" placeholder="SSID">
+                        <label>Password</label>
+                        <input id="wifiPassword" type="text"
+                            placeholder="Password">
+                    </div>
+                </div>
+
+                <div class="toggle-content" id="ap-settings"><!-- AP -->
+                    <div class="setting">
+                        <label>SSID</label>
+                        <input id="apSSID" type="text" placeholder="SSID">
+                        <label>Password</label>
+                        <input id="apPassword" type="text"
+                            placeholder="Password">
+                    </div>
+                </div>
+
+                <div class="toggle-content" id="mode-settings"><!-- Mode -->
+                    <div class="setting">
+                        <label>Current Mode:</label>
+                        <label id="currentMode">Client</label>
+                    </div>
+                </div>
+
+                <div class="toggle-content" id="openai-settings"><!-- OpenAI -->
+                    <div class="setting">
+                        <label>API Key</label>
+                        <input id="openAIKey" type="text"
+                            placeholder="API Key">
+                        <label>Voice</label>
+                        <input id="openAIVoice" type="text"
+                            placeholder="Voice">
+                        <label>System Message</label>
+                        <input id="openAISystemMessage" type="text"
+                            placeholder="System Message">
+                    </div>
+                </div>
+
+                <div class="toggle-content" id="save-settings"> <!-- Save -->
+                    <button id="saveButton" class="clickable button"
+                        style="background-color: brown;">Save</button>
+                </div>
+
+                <div class="toggle-content"
+                    id="ap-mode-settings"><!-- AP Mode -->
+                    <div class="setting">
+                        <button id="apModeButton" class="clickable button"
+                            style="background-color: brown;">Restart in AP
+                            Mode</button>
+                    </div>
+                </div>
+
+                <div class="toggle-content"
+                    id="client-mode-settings"><!-- Client Mode -->
+                    <div class="setting">
+                        <button id="clientModeButton" class="clickable button"
+                            style="background-color: brown;">Restart in Client
+                            Mode</button>
+                    </div>
+                </div>
+
+                <div class="toggle-content" id="files-settings"><!-- Files -->
+                    <div class="setting">
+                        <button id="fetchFilesButton">Fetch File List</button>
+                        <ul id="fileList"></ul>
+                    </div>
+                </div>
+
+                <div class="toggle-content" id="about-settings"
+                    style="display: block;"><!-- About -->
+
+                    <div class="setting">
+                        <label>Version</label>
+                        <label id="version">0.0.1</label>
+                    </div>
+
+                    <div class="setting">
+                        <label>Designed and Developed by:</label>
+                        <a href="https://github.com/seemywingz/ESPWiFi"
+                            target="_blank" id="SeeMyWingZ">SeeMyWingZ</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <script src="script.js"></script>
+    </body>
+</html>

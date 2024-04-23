@@ -1,0 +1,17 @@
+{
+    "mode": "client",
+    "mdns": "",
+    "client": {
+        "ssid": "",
+        "password": ""
+    },
+    "ap": {
+        "ssid": "",
+        "password": ""
+    },
+    "openAI": {
+        "apiKey" : "",
+        "voice": "onyx",
+        "system_message": "You are a helpful assistant. On the ESP32-C3 device"
+    }
+}
