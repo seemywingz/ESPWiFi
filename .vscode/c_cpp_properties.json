@@ -223,6 +223,8 @@
                 "/Users/kjj/Library/Arduino15/packages/esp32/hardware/esp32/2.0.15/cores/esp32",
                 "/Users/kjj/Library/Arduino15/packages/esp32/hardware/esp32/2.0.15/variants/esp32c3",
                 "/Users/kjj/Documents/Arduino/libraries/ArduinoJson/src",
+                "/Users/kjj/Documents/Arduino/libraries/ESP8266Audio/src",
+                "/Users/kjj/Documents/Arduino/libraries/IOPin",
                 "/Users/kjj/Library/Arduino15/packages/esp32/hardware/esp32/2.0.15/libraries/ESPmDNS/src",
                 "/Users/kjj/Library/Arduino15/packages/esp32/hardware/esp32/2.0.15/libraries/HTTPClient/src",
                 "/Users/kjj/Library/Arduino15/packages/esp32/hardware/esp32/2.0.15/libraries/WiFi/src",
