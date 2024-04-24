@@ -24,7 +24,7 @@ String ESPWiFi::openAIChat(String text) {
   doc["messages"].add(JsonObject());
   doc["messages"][1]["role"] = "user";
   doc["messages"][1]["content"] = text;
-  doc["max_tokens"] = 100;
+  doc["max_tokens"] = 90;
   String payload;
   serializeJson(doc, payload);
   String contentType = "application/json";
@@ -35,8 +35,10 @@ String ESPWiFi::openAIChat(String text) {
 
   DynamicJsonDocument resDoc(512);
   deserializeJson(resDoc, response);
-  if (resDoc["choices"][0]["message"]["content"].is<String>()) {
-    return resDoc["choices"][0]["message"]["content"].as<String>();
+  String resString = resDoc["choices"][0]["message"]["content"].as<String>();
+  Serial.println("OpenAI response: " + resString);
+  if (resString != "") {
+    return resString;
   } else {
     return "Error parsing response";
   }
@@ -79,24 +81,24 @@ void ESPWiFi::openAI_TTS(String text, String filePath) {
 
   if (httpCode == HTTP_CODE_OK) {
     // Open the file for writing in binary mode
-    Serial.println("OpenAI TTS request successful, writing to file...");
+    Serial.println("OpenAI TTS request successful");
+    Serial.println("Writing to file: " + filePath);
     File file = LittleFS.open(filePath, "w+");
     if (!file) {
       Serial.println("Failed to open file for writing");
       http.end();  // End the connection
       return;
     }
-
     // Stream the response into the file
     http.writeToStream(&file);
     file.close();
+    http.end();
     Serial.println("File written successfully");
   } else {
     Serial.print("HTTP POST failed, error: ");
     Serial.println(http.errorToString(httpCode).c_str());
+    http.end();
   }
-
-  http.end();
 }
 
 #endif  // ESPWIFI_OPENAI_H

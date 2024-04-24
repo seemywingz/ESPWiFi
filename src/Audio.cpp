@@ -5,7 +5,6 @@
 
 // Audio
 AudioFileSourceLittleFS *fileLFS;
-AudioGeneratorWAV *wav;
 AudioGeneratorMP3 *mp3;
 AudioOutputI2S *dac;
 
@@ -19,24 +18,20 @@ IOPin spk = IOPin(A0, INPUT);
 
 void ESPWiFi::startAudio() {
   dac = new AudioOutputI2S();
-  dac->SetPinout(15, 2, 3);  // BCLK, LRC, DOUT
-  wav = new AudioGeneratorWAV();
+  dac->SetPinout(BCLK, LRC, DOUT);
   mp3 = new AudioGeneratorMP3();
 }
 
 void ESPWiFi::playMP3(String filename) {
   fileLFS = new AudioFileSourceLittleFS(filename.c_str());
-  ptt.on();
-  delay(100);
+
+  if (pttEnabled) {
+    ptt.on();
+    delay(300);
+  }
 
   String fileExtention = getFileExtension(filename);
-  if (fileExtention == "wav") {
-    Serial.println("Playing WAV file: " + String(filename));
-    if (!wav->begin(fileLFS, dac)) {
-      Serial.println("Failed to begin WAV playback");
-      return;
-    }
-  } else if (fileExtention == "mp3") {
+  if (fileExtention == "mp3") {
     Serial.println("Playing MP3 file: " + String(filename));
     if (!mp3->begin(fileLFS, dac)) {
       Serial.println("Failed to begin MP3 playback");
@@ -49,16 +44,14 @@ void ESPWiFi::playMP3(String filename) {
 }
 
 void ESPWiFi::handleAudio(std::function<void()> respond) {
-  if (wav->isRunning()) {
-    if (!wav->loop()) {
-      wav->stop();
-    }
-  } else if (mp3->isRunning()) {
+  if (mp3->isRunning()) {
     if (!mp3->loop()) {
       mp3->stop();
     }
   } else if (!receivingAudio) {
-    ptt.off();
+    if (pttEnabled) {
+      ptt.off();
+    }
   }
   runAtInterval(100, lastAudioCheck, [&]() {
     int audioLevel = spk.readA();

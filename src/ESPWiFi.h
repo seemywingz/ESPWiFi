@@ -5,7 +5,6 @@
 #include <ArduinoJson.h>
 #include <AudioFileSourceLittleFS.h>
 #include <AudioGeneratorMP3.h>
-#include <AudioGeneratorWAV.h>
 #include <AudioOutputI2S.h>
 #include <IOPin.h>
 #include <LittleFS.h>
@@ -119,6 +118,10 @@ class ESPWiFi {
                      std::function<void()> functionToRun);
 
   // Audio
+  bool pttEnabled = false;
+  int BCLK = 15;
+  int LRC = 2;
+  int DOUT = 3;
   void startAudio();
   void handleAudio(std::function<void()> respond = []() {});
   void playMP3(String file);
