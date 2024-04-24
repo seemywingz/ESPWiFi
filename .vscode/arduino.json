@@ -1,6 +1,6 @@
 {
     "board": "esp32:esp32:esp32c3",
-    "port": "/dev/tty.usbmodem141301",
+    "port": "/dev/tty.usbmodem1101",
     "output": ".arduino",
     "sketch": "ESPWiFi.ino",
     "programmer": "esptool",
