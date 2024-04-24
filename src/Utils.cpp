@@ -3,6 +3,16 @@
 
 #include "ESPWiFi.h"
 
+void ESPWiFi::runAtInterval(unsigned int interval,
+                            unsigned long& lastIntervalRun,
+                            std::function<void()> functionToRun) {
+  unsigned long currentRunTime = millis();
+  if (currentRunTime - lastIntervalRun >= interval) {
+    lastIntervalRun = currentRunTime;
+    functionToRun();
+  }
+}
+
 String ESPWiFi::getFileExtension(const String& filename) {
   int dotIndex = filename.lastIndexOf(".");
   if (dotIndex == -1) {

@@ -3,6 +3,13 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <AudioFileSourceLittleFS.h>
+#include <AudioGeneratorMP3.h>
+#include <AudioGeneratorWAV.h>
+#include <AudioOutputI2S.h>
+#include <IOPin.h>
+#include <LittleFS.h>
+#include <WiFiClient.h>
 
 #ifdef ESP8266
 #include <ESP8266HTTPClient.h>
@@ -16,9 +23,6 @@
 #include <WebServer.h>
 #include <WiFi.h>
 #endif
-
-#include <LittleFS.h>
-#include <WiFiClient.h>
 
 class ESPWiFi {
  public:
@@ -97,7 +101,12 @@ class ESPWiFi {
     Serial.println(WiFi.softAPIP());
   }
 
-  void handleClient() { webServer.handleClient(); }
+  void handleClient() {
+    webServer.handleClient();
+#ifdef ESP8266
+    MDNS.update();
+#endif
+  }
 
   // Utils
   String getContentType(String filename);
@@ -106,6 +115,13 @@ class ESPWiFi {
                           const String& token = "",
                           const String& contentType = "",
                           const String& payload = "");
+  void runAtInterval(unsigned int interval, unsigned long& lastIntervalRun,
+                     std::function<void()> functionToRun);
+
+  // Audio
+  void startAudio();
+  void handleAudio(std::function<void()> respond = []() {});
+  void playMP3(String file);
 
   // OpenAI
   String openAIChat(String text);
