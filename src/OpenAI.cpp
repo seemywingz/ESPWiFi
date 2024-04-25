@@ -27,7 +27,9 @@ String ESPWiFi::openAI_Chat(String text) {
 
   String payload;
   serializeJson(doc, payload);
-  Serial.println("Payload: " + payload);
+
+  Serial.println("Sending request to OpenAI Chat");
+  Serial.println("\tPayload: " + payload);
 
   WiFiClientSecure client;
   client.setInsecure();     // Disable certificate verification
@@ -41,12 +43,14 @@ String ESPWiFi::openAI_Chat(String text) {
   http.addHeader("Authorization",
                  "Bearer " + config["openAI"]["apiKey"].as<String>());
 
-  Serial.println("Sending request to OpenAI Chat");
   int httpCode = http.POST(payload);
+  String response = http.getString();
+
+  Serial.println("\tResponse: " + response);
 
   if (httpCode == HTTP_CODE_OK) {
     doc.clear();
-    deserializeJson(doc, http.getString());
+    deserializeJson(doc, response);
     String resString = doc["choices"][0]["message"]["content"].as<String>();
     http.end();
     if (resString != "") {
@@ -61,8 +65,6 @@ String ESPWiFi::openAI_Chat(String text) {
     http.end();
     return error;
   }
-
-  return "Sorry, I didn't understand that. Please try again.";
 }
 
 void ESPWiFi::openAI_TTS(String text, String filePath) {
@@ -82,6 +84,9 @@ void ESPWiFi::openAI_TTS(String text, String filePath) {
   String payload;
   serializeJson(doc, payload);
 
+  Serial.println("Sending request to OpenAI TTS");
+  Serial.println("\tPayload: " + payload);
+
   // Configure the secure client and make the request
   WiFiClientSecure client;
   client.setInsecure();  // Disable certificate verification (not recommended
@@ -95,6 +100,7 @@ void ESPWiFi::openAI_TTS(String text, String filePath) {
                  "Bearer " + config["openAI"]["apiKey"].as<String>());
 
   int httpCode = http.POST(payload);
+  Serial.println("\tResponse HTTP Code: " + String(httpCode));
 
   if (httpCode == HTTP_CODE_OK) {
     // Open the file for writing in binary mode
