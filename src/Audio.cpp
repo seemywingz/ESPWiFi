@@ -43,7 +43,7 @@ void ESPWiFi::playMP3(String filename) {
   }
 }
 
-void ESPWiFi::handleAudio(std::function<void()> respond) {
+void ESPWiFi::handleAudio() {
   if (mp3->isRunning()) {
     if (!mp3->loop()) {
       mp3->stop();
@@ -70,7 +70,7 @@ void ESPWiFi::handleAudio(std::function<void()> respond) {
     }
 
     if (!receivingAudio && !responded) {
-      respond();
+      audioResponse();
       responded = true;
     }
   });

@@ -124,13 +124,17 @@ class ESPWiFi {
                      std::function<void()> functionToRun);
 
   // Audio
-  bool pttEnabled = false;
   void startAudio();
-  void handleAudio(std::function<void()> respond = []() {});
+  void handleAudio();
+  bool pttEnabled = false;
   void playMP3(String file);
+  std::function<void()> audioResponse = []() {};
 
   // OpenAI
-  String openAIChat(String text);
+  String openAI_URL = "https://api.openai.com";
+  String openAI_TTSEndpoint = "/v1/audio/speech";
+  String openAI_ChatEndpoint = "/v1/chat/completions";
+  String openAI_Chat(String text);
   void openAI_TTS(String text, String filePath);
 
  private:

@@ -3,19 +3,15 @@
 
 #include "ESPWiFi.h"
 
-String openAI_URL = "https://api.openai.com/v1/";
-
-String ESPWiFi::openAIChat(String text) {
+String ESPWiFi::openAI_Chat(String text) {
   if (config["openAI"]["apiKey"] == "") {
     Serial.println("OpenAI key not set");
     return "";
   }
 
-  String url = openAI_URL + "chat/completions";
-
   // Prepare the JSON payload
   DynamicJsonDocument doc(512);
-  doc["model"] = "gpt-4-turbo-preview";
+  doc["model"] = "gpt-3.5-turbo";
   doc["messages"] = JsonArray();
   doc["messages"].add(JsonObject());
   doc["messages"][0]["role"] = "system";
@@ -24,46 +20,43 @@ String ESPWiFi::openAIChat(String text) {
   doc["messages"].add(JsonObject());
   doc["messages"][1]["role"] = "user";
   doc["messages"][1]["content"] = text;
-  doc["max_tokens"] = 90;
+  doc["max_tokens"] = 120;
+
   String payload;
   serializeJson(doc, payload);
-  String contentType = "application/json";
-
-  // Make the request
-  // String response = makeHTTPSRequest("POST", url, config["openAI"]["apiKey"],
-  //                                    contentType, payload);
 
   WiFiClientSecure client;
-  client.setInsecure();  // Disable certificate verification (not recommended
-                         // for production)
-  HTTPClient http;
+  client.setInsecure();     // Disable certificate verification
+  client.setTimeout(9000);  // 15 seconds
 
-  http.begin(client, url);
+  HTTPClient http;
+  http.begin(client, openAI_URL + openAI_ChatEndpoint);
+
+  // Set headers
   http.addHeader("Content-Type", "application/json");
   http.addHeader("Authorization",
                  "Bearer " + config["openAI"]["apiKey"].as<String>());
 
   int httpCode = http.POST(payload);
-  String response = http.getString();
 
-  if (httpCode != HTTP_CODE_OK) {
-    Serial.print("OpenAI Chat HTTP POST failed, error: ");
-    Serial.println(http.errorToString(httpCode).c_str());
+  if (httpCode == HTTP_CODE_OK) {
+    DynamicJsonDocument resDoc(512);
+    deserializeJson(resDoc, http.getString());
+    String resString = resDoc["choices"][0]["message"]["content"].as<String>();
     http.end();
-    return "Error making request";
-  }
-
-  DynamicJsonDocument resDoc(512);
-  deserializeJson(resDoc, response);
-  String resString = resDoc["choices"][0]["message"]["content"].as<String>();
-  Serial.println("OpenAI response: " + response);
-  if (resString != "") {
-    return resString;
+    if (resString != "") {
+      return resString;
+    } else {
+      return "Error parsing response";
+    }
   } else {
-    return "Error parsing response";
+    String error =
+        "OpenAI Chat HTTP POST, error: " + http.errorToString(httpCode);
+    Serial.println(error);
+    http.end();
+    return error;
   }
 
-  http.end();
   return "Sorry, I didn't understand that. Please try again.";
 }
 
@@ -73,15 +66,12 @@ void ESPWiFi::openAI_TTS(String text, String filePath) {
     return;
   }
 
-  String url = openAI_URL + "audio/speech";
-  String extension = getFileExtension(filePath);
-
   // Prepare the JSON payload
   DynamicJsonDocument doc(512);
   doc["model"] = "tts-1";
   doc["input"] = text;
   doc["voice"] = config["openAI"]["voice"].as<String>();
-  doc["response_format"] = extension;
+  doc["response_format"] = getFileExtension(filePath);
 
   String payload;
   serializeJson(doc, payload);
@@ -91,7 +81,7 @@ void ESPWiFi::openAI_TTS(String text, String filePath) {
   client.setInsecure();  // Disable certificate verification (not recommended
                          // for production)
   HTTPClient http;
-  http.begin(client, url);
+  http.begin(client, openAI_URL + openAI_TTSEndpoint);
 
   // Set headers
   http.addHeader("Content-Type", "application/json");
@@ -120,7 +110,6 @@ void ESPWiFi::openAI_TTS(String text, String filePath) {
     Serial.println(http.errorToString(httpCode).c_str());
     http.end();
   }
-  http.end();
 }
 
 #endif  // ESPWIFI_OPENAI_H
