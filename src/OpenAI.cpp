@@ -11,7 +11,7 @@ String ESPWiFi::openAI_Chat(String text) {
 
   // Prepare the JSON payload
   DynamicJsonDocument doc(512);
-  doc["model"] = "gpt-3.5-turbo";
+  doc["model"] = "gpt-4-turbo-preview";
   doc["messages"] = JsonArray();
   doc["messages"].add(JsonObject());
   doc["messages"][0]["role"] = "system";
@@ -20,7 +20,7 @@ String ESPWiFi::openAI_Chat(String text) {
   doc["messages"].add(JsonObject());
   doc["messages"][1]["role"] = "user";
   doc["messages"][1]["content"] = text;
-  doc["max_tokens"] = 120;
+  doc["max_tokens"] = 90;
 
   String payload;
   serializeJson(doc, payload);
@@ -37,12 +37,13 @@ String ESPWiFi::openAI_Chat(String text) {
   http.addHeader("Authorization",
                  "Bearer " + config["openAI"]["apiKey"].as<String>());
 
+  Serial.println("Sending request to OpenAI Chat");
   int httpCode = http.POST(payload);
 
   if (httpCode == HTTP_CODE_OK) {
-    DynamicJsonDocument resDoc(512);
-    deserializeJson(resDoc, http.getString());
-    String resString = resDoc["choices"][0]["message"]["content"].as<String>();
+    doc.clear();
+    deserializeJson(doc, http.getString());
+    String resString = doc["choices"][0]["message"]["content"].as<String>();
     http.end();
     if (resString != "") {
       return resString;
@@ -106,7 +107,7 @@ void ESPWiFi::openAI_TTS(String text, String filePath) {
     http.end();
     Serial.println("File written successfully");
   } else {
-    Serial.print("HTTP POST failed, error: ");
+    Serial.print("OpenAI TTS HTTP POST, error: ");
     Serial.println(http.errorToString(httpCode).c_str());
     http.end();
   }
