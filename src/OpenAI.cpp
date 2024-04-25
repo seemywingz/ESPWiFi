@@ -104,8 +104,7 @@ void ESPWiFi::openAI_TTS(String text, String filePath) {
 
   if (httpCode == HTTP_CODE_OK) {
     // Open the file for writing in binary mode
-    Serial.println("OpenAI TTS request successful");
-    Serial.println("Writing to file: " + filePath);
+    Serial.println("Writing OpenAI TTS Response to file: " + filePath);
     File file = LittleFS.open(filePath, "w+");
     if (!file) {
       Serial.println("Failed to open file for writing");

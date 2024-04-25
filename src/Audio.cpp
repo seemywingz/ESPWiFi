@@ -6,7 +6,7 @@
 // Audio
 AudioFileSourceLittleFS *fileLFS;
 AudioGeneratorMP3 *mp3;
-AudioOutputI2S *dac;
+static AudioOutputI2S *dac;
 
 unsigned long lastAudioCheck = 0;
 bool receivingAudio = false;
@@ -19,26 +19,45 @@ IOPin spk = IOPin(A0, INPUT);
 void ESPWiFi::startAudio() {
   dac = new AudioOutputI2S();
   dac->SetPinout(BCLK, LRC, DOUT);
-  mp3 = new AudioGeneratorMP3();
+  // mp3 = new AudioGeneratorMP3();
 }
 
 void ESPWiFi::playMP3(String filename) {
+  // Reinitialize the MP3 decoder before every use
+  if (mp3 != nullptr) {
+    delete mp3;
+    mp3 = nullptr;
+  }
+  mp3 = new AudioGeneratorMP3();
+  if (!mp3) {
+    Serial.println("Failed to create MP3 decoder");
+    return;
+  }
+
+  if (fileLFS != nullptr) {
+    delete fileLFS;
+    fileLFS = nullptr;
+  }
   fileLFS = new AudioFileSourceLittleFS(filename.c_str());
+  if (!fileLFS || !fileLFS->isOpen()) {
+    Serial.println("Failed to open file: " + filename);
+    return;
+  }
 
   if (pttEnabled) {
     ptt.on();
-    delay(600);
+    delay(600);  // Consider making this non-blocking
   }
 
-  String fileExtention = getFileExtension(filename);
-  if (fileExtention == "mp3") {
-    Serial.println("Playing MP3 file: " + String(filename));
+  String fileExtension = getFileExtension(filename);
+  if (fileExtension == "mp3") {
+    Serial.println("Playing MP3 file: " + filename);
     if (!mp3->begin(fileLFS, dac)) {
       Serial.println("Failed to begin MP3 playback");
       return;
     }
   } else {
-    Serial.println("Unsupported file format: " + fileExtention);
+    Serial.println("Unsupported file format: " + fileExtension);
     return;
   }
 }
@@ -47,7 +66,10 @@ void ESPWiFi::handleAudio() {
   if (mp3->isRunning()) {
     if (!mp3->loop()) {
       mp3->stop();
+      delete mp3;
       delete fileLFS;
+      mp3 = nullptr;
+      fileLFS = nullptr;
     }
   } else if (!receivingAudio) {
     if (pttEnabled) {
