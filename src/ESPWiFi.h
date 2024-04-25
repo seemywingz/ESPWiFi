@@ -31,7 +31,7 @@
 
 class ESPWiFi {
  public:
-  DynamicJsonDocument config = DynamicJsonDocument(256);
+  JsonDocument config;
 
   String configFile = "/config.json";
 

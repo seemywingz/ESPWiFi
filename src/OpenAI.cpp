@@ -10,20 +10,24 @@ String ESPWiFi::openAI_Chat(String text) {
   }
 
   // Prepare the JSON payload
-  DynamicJsonDocument doc(512);
+  JsonDocument doc;
   doc["model"] = "gpt-4-turbo-preview";
-  doc["messages"] = JsonArray();
-  doc["messages"].add(JsonObject());
-  doc["messages"][0]["role"] = "system";
-  doc["messages"][0]["content"] =
-      config["openAI"]["system_message"].as<String>();
-  doc["messages"].add(JsonObject());
-  doc["messages"][1]["role"] = "user";
-  doc["messages"][1]["content"] = text;
+  JsonArray messages = doc["messages"].to<JsonArray>();
+
+  JsonObject messages_0 = messages.add<JsonObject>();
+  messages_0["role"] = "system";
+  messages_0["content"] = config["openAI"]["system_message"].as<String>();
+
+  JsonObject messages_1 = messages.add<JsonObject>();
+  messages_1["role"] = "user";
+  messages_1["content"] = text;
   doc["max_tokens"] = 90;
+
+  doc.shrinkToFit();
 
   String payload;
   serializeJson(doc, payload);
+  Serial.println("Payload: " + payload);
 
   WiFiClientSecure client;
   client.setInsecure();     // Disable certificate verification
@@ -68,11 +72,12 @@ void ESPWiFi::openAI_TTS(String text, String filePath) {
   }
 
   // Prepare the JSON payload
-  DynamicJsonDocument doc(512);
+  JsonDocument doc;
   doc["model"] = "tts-1";
   doc["input"] = text;
   doc["voice"] = config["openAI"]["voice"].as<String>();
   doc["response_format"] = getFileExtension(filePath);
+  doc.shrinkToFit();
 
   String payload;
   serializeJson(doc, payload);
