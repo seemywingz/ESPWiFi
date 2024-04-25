@@ -66,10 +66,6 @@ void ESPWiFi::handleAudio() {
   if (mp3->isRunning()) {
     if (!mp3->loop()) {
       mp3->stop();
-      delete mp3;
-      delete fileLFS;
-      mp3 = nullptr;
-      fileLFS = nullptr;
     }
   } else if (!receivingAudio) {
     if (pttEnabled) {
