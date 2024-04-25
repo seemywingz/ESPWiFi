@@ -16,11 +16,17 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #define WebServer ESP8266WebServer
+#define BCLK 15
+#define LRC 2
+#define DOUT 3
 #else
 #include <ESPmDNS.h>
 #include <HTTPClient.h>
 #include <WebServer.h>
 #include <WiFi.h>
+#define BCLK 26
+#define LRC 25
+#define DOUT 22
 #endif
 
 class ESPWiFi {
@@ -119,9 +125,6 @@ class ESPWiFi {
 
   // Audio
   bool pttEnabled = false;
-  int BCLK = 15;
-  int LRC = 2;
-  int DOUT = 3;
   void startAudio();
   void handleAudio(std::function<void()> respond = []() {});
   void playMP3(String file);

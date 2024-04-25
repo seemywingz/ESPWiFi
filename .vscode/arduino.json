@@ -2,5 +2,6 @@
     "board": "esp32:esp32:esp32c3",
     "port": "/dev/tty.usbmodem141301",
     "output": ".arduino",
-    "sketch": "ESPWiFi.ino"
+    "sketch": "ESPWiFi.ino",
+    "configuration": "JTAGAdapter=default,CDCOnBoot=cdc,PartitionScheme=default,CPUFreq=160,FlashMode=qio,FlashFreq=80,FlashSize=4M,UploadSpeed=921600,DebugLevel=warn,EraseFlash=none"
 }

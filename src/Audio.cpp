@@ -27,7 +27,7 @@ void ESPWiFi::playMP3(String filename) {
 
   if (pttEnabled) {
     ptt.on();
-    delay(300);
+    delay(600);
   }
 
   String fileExtention = getFileExtension(filename);
@@ -47,6 +47,7 @@ void ESPWiFi::handleAudio(std::function<void()> respond) {
   if (mp3->isRunning()) {
     if (!mp3->loop()) {
       mp3->stop();
+      delete fileLFS;
     }
   } else if (!receivingAudio) {
     if (pttEnabled) {
