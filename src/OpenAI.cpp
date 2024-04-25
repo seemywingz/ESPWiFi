@@ -56,11 +56,11 @@ String ESPWiFi::openAI_Chat(String text) {
     if (resString != "") {
       return resString;
     } else {
-      return "Error parsing response";
+      return "\tError parsing response";
     }
   } else {
     String error =
-        "OpenAI Chat HTTP POST, error: " + http.errorToString(httpCode);
+        "\tOpenAI Chat HTTP POST, error: " + http.errorToString(httpCode);
     Serial.println(error);
     http.end();
     return error;
@@ -104,7 +104,7 @@ void ESPWiFi::openAI_TTS(String text, String filePath) {
 
   if (httpCode == HTTP_CODE_OK) {
     // Open the file for writing in binary mode
-    Serial.println("Writing OpenAI TTS Response to file: " + filePath);
+    Serial.println("\tWriting OpenAI TTS Response to file: " + filePath);
     File file = LittleFS.open(filePath, "w+");
     if (!file) {
       Serial.println("Failed to open file for writing");
@@ -115,9 +115,9 @@ void ESPWiFi::openAI_TTS(String text, String filePath) {
     http.writeToStream(&file);
     file.close();
     http.end();
-    Serial.println("File written successfully");
+    Serial.println("\tFile written successfully");
   } else {
-    Serial.print("OpenAI TTS HTTP POST, error: ");
+    Serial.print("\tOpenAI TTS HTTP POST, error: ");
     Serial.println(http.errorToString(httpCode).c_str());
     http.end();
   }
