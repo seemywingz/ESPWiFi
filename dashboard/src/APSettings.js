@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
-function APSettings({ config, updateConfig }) {
+function APSettings({ config, updateConfig: saveConfig }) {
     const [apSSID, setApSSID] = useState(config.ap.ssid);
     const [apPassword, setApPassword] = useState(config.ap.password);
 
     const handleSave = () => {
-        updateConfig({ ...config, client: { apSSID, apPassword } });
+        saveConfig({ ...config, client: { apSSID, apPassword } });
     };
 
     const restartAsAP = () => {
         const newConfig = { ...config, mode: 'ap' };
-        updateConfig(newConfig);
+        saveConfig(newConfig);
         fetch('/restart', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
-function WiFiSettings({ config, updateConfig }) {
+function WiFiSettings({ config, updateConfig: saveConfig }) {
     const [ssid, setSSID] = useState(config.client.ssid);
     const [password, setPassword] = useState(config.client.password);
 
     const handleSave = () => {
-        updateConfig({ ...config, client: { ssid, password } });
+        saveConfig({ ...config, client: { ssid, password } });
     };
 
     const restartAsClient = () => {
         const newConfig = { ...config, mode: 'client' };
-        updateConfig(newConfig);
+        saveConfig(newConfig);
         fetch('/restart', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

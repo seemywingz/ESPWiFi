@@ -33,7 +33,7 @@ function App() {
       .catch(error => console.error('Error loading configuration:', error));
   }, []);
 
-  const updateConfig = (newConfig) => {
+  const saveConfig = (newConfig) => {
     fetch('/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -57,9 +57,9 @@ function App() {
   const renderSetting = () => {
     switch (selectedSetting) {
       case 'wifi':
-        return <WiFiSettings config={config} updateConfig={updateConfig} />;
+        return <WiFiSettings config={config} saveConfig={saveConfig} />;
       case 'ap':
-        return <APSettings config={config} updateConfig={updateConfig} />;
+        return <APSettings config={config} saveConfig={saveConfig} />;
       case 'files':
         return <FileSettings />;
       // case 'openai':
