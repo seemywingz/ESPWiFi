@@ -1,17 +1,18 @@
 {
+    "version": "0.0.1",
     "mode": "client",
-    "mdns": "",
+    "mdns": "ESPWiFi",
     "client": {
-        "ssid": "",
-        "password": ""
+        "ssid": "YOUR_SSID",
+        "password": "YOUR_PASSWORD"
     },
     "ap": {
-        "ssid": "",
-        "password": ""
+        "ssid": "ESPWiFi-AP",
+        "password": "abcd1234"
     },
     "openAI": {
         "apiKey" : "",
         "voice": "onyx",
-        "system_message": "You are a helpful assistant. On the ESP32-C3 device"
+        "system_message": "You are a helpful assistant. On an ESP Micro Controller."
     }
 }
