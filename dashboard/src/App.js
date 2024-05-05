@@ -76,6 +76,8 @@ function App() {
           </div>
 
         </div>;
+      default:
+        return <div>Not implemented</div>;
     }
   };
 

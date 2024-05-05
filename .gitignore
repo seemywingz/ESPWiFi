@@ -1,4 +1,4 @@
 .DS_Store
 .arduino/
-data/wifi-credentials
-data/config.json
+data/
+!data/config.example.json
