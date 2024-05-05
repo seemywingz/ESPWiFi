@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import WiFiSettings from './WiFiSettings';
 import APSettings from './APSettings';
+import FileSettings from './FileSettings';
 
 var defaultConfig = {
   "version": "0.0.1",
@@ -59,6 +60,8 @@ function App() {
         return <WiFiSettings config={config} updateConfig={updateConfig} />;
       case 'ap':
         return <APSettings config={config} updateConfig={updateConfig} />;
+      case 'files':
+        return <FileSettings />;
       // case 'openai':
       //   return <OpenAISettings config={config} updateConfig={updateConfig} />;
       // Add other cases as needed
@@ -73,7 +76,7 @@ function App() {
           <div class="setting">
             <label>Designed and Developed by:</label>
             <a href="https://github.com/seemywingz/ESPWiFi-base"
-              target="_blank" id="SeeMyWingZ">SeeMyWingZ</a>
+              target="_blank" id="SeeMyWingZ" rel="noreferrer">SeeMyWingZ</a>
           </div>
 
         </div>;
