@@ -3,6 +3,7 @@ import WiFiSettings from './WiFiSettings';
 import APSettings from './APSettings';
 
 var defaultConfig = {
+  "version": "0.0.1",
   "mode": "client",
   "mdns": "ESPWiFi",
   "client": {
@@ -60,8 +61,21 @@ function App() {
       // case 'openai':
       //   return <OpenAISettings config={config} updateConfig={updateConfig} />;
       // Add other cases as needed
-      default:
-        return <div>Select a setting to configure</div>;
+      case 'about':
+        return <div class="setting" id="about-settings">
+
+          <div class="setting">
+            <label>Version</label>
+            <label id="version">{config.version}</label>
+          </div>
+
+          <div class="setting">
+            <label>Designed and Developed by:</label>
+            <a href="https://github.com/seemywingz/ESPWiFi-base"
+              target="_blank" id="SeeMyWingZ">SeeMyWingZ</a>
+          </div>
+
+        </div>;
     }
   };
 
