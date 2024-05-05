@@ -39,6 +39,8 @@ class ESPWiFi {
 
   int maxConnectAttempts = 120;
 
+  void (*connectSubroutine)() = nullptr;
+
   ESPWiFi() {}
 
   void init() {
@@ -82,6 +84,9 @@ class ESPWiFi {
         defaultConfig();
         startAP();
         return;
+      }
+      if (connectSubroutine != nullptr) {
+        connectSubroutine();
       }
       digitalWrite(LED_BUILTIN, HIGH);
       delay(250);
