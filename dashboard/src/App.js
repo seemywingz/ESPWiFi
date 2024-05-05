@@ -75,7 +75,7 @@ function App() {
 
           <div class="setting">
             <label>Designed and Developed by:</label>
-            <a href="https://github.com/seemywingz/ESPWiFi-base"
+            <a href="https://github.com/seemywingz/ESPWiFi"
               target="_blank" id="SeeMyWingZ" rel="noreferrer">SeeMyWingZ</a>
           </div>
 
