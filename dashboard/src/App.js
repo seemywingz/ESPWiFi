@@ -43,6 +43,7 @@ function App() {
     }).then(data => {
       setConfig(newConfig);
       console.log('Configuration updated:', data);
+      alert('Configuration updated');
     }).catch(error => console.error('Error updating configuration:', error));
   };
 

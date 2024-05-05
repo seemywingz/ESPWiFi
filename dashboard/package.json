@@ -15,6 +15,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "dist": "npm run build && cp -r build/* ../data/.",
+    "dist-upload": "npm run dist && . ~/.zshrc && esp-fs-upload -d ../data/",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
