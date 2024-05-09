@@ -141,6 +141,12 @@ class ESPWiFi {
 #endif
   }
 
+  void saveConfig() {
+    File file = LittleFS.open(configFile, "w");
+    serializeJson(config, file);
+    file.close();
+  }
+
   // Utils
   String getContentType(String filename);
   String getFileExtension(const String& filename);
@@ -211,9 +217,7 @@ class ESPWiFi {
       if (error) {
         webServer.send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
       } else {
-        File file = LittleFS.open(configFile, "w");
-        serializeJson(config, file);
-        file.close();
+        saveConfig();
         webServer.send(200, "application/json", "{\"success\":true}");
       }
     });
