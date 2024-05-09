@@ -12,9 +12,14 @@ function FileSettings() {
             .catch(error => console.error('Failed to load files:', error));
     }, []);
 
+    if (!files.length) {
+        return (
+            <div>Loading Files... ⚙️</div>
+        );
+    }
+
     return (
         <div className="setting">
-            <h2>File List</h2>
             <ul id="fileList">
                 {files.map((file, index) => (
                     <li key={index} >

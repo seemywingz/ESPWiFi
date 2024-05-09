@@ -37,7 +37,7 @@ class ESPWiFi {
 
   WebServer webServer;
 
-  int maxConnectAttempts = 120;
+  int maxConnectAttempts = 10;
 
   void (*connectSubroutine)() = nullptr;
 
@@ -77,11 +77,11 @@ class ESPWiFi {
     Serial.println("\n\nConnecting to:");
     Serial.println("\tSSID: " + ssid);
     Serial.println("\tPassword: " + password);
+    int connectionAttempts = maxConnectAttempts;
     while (WiFi.status() != WL_CONNECTED) {
-      if (--maxConnectAttempts == 0) {
+      if (--connectionAttempts == 0) {
         Serial.println("Failed to connect to WiFi");
-        maxConnectAttempts = 90;
-        defaultConfig();
+        config["mode"] = "ap";
         startAP();
         return;
       }
@@ -100,15 +100,38 @@ class ESPWiFi {
     Serial.println(WiFi.localIP());
   }
 
+  int selectBestChannel() {
+    int channels[14] = {
+        0};  // Array to hold channel usage counts, 14 for 2.4 GHz band
+    int numNetworks = WiFi.scanNetworks();
+    for (int i = 0; i < numNetworks; i++) {
+      int channel = WiFi.channel(i);
+      if (channel > 0 &&
+          channel <= 13) {  // Ensure the channel is within a valid range
+        channels[channel]++;
+      }
+    }
+    int leastCongestedChannel = 1;  // Default to channel 1
+    for (int i = 1; i <= 13; i++) {
+      if (channels[i] < channels[leastCongestedChannel]) {
+        leastCongestedChannel = i;
+      }
+    }
+    return leastCongestedChannel;
+  }
+
   void startAP() {
     String ssid = config["ap"]["ssid"];
     String password = config["ap"]["password"];
-    WiFi.softAP(ssid, password);
+    int bestChannel = selectBestChannel();
+    WiFi.softAP(ssid, password, bestChannel);
     Serial.println("\n\nStarting Access Point:");
     Serial.println("\tSSID: " + ssid);
     Serial.println("\tPassword: " + password);
     Serial.print("\tIP Address: ");
     Serial.println(WiFi.softAPIP());
+    Serial.print("\tChannel: ");
+    Serial.println(bestChannel);
   }
 
   void handleClient() {
