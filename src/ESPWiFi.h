@@ -222,7 +222,7 @@ class ESPWiFi {
       }
     });
 
-    webServer.on("/restart", HTTP_POST, [this]() {
+    webServer.on("/restart", HTTP_GET, [this]() {
       webServer.send(200, "application/json", "{\"success\":true}");
       Serial.println("Restarting...");
       delay(1000);
