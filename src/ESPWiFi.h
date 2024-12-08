@@ -219,10 +219,13 @@ class ESPWiFi {
       String body = webServer.arg("plain");
       DeserializationError error = deserializeJson(config, body);
       if (error) {
-        webServer.send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
+        webServer.send(400, "application/json",
+                       "{\"error:\"" + String(error.c_str()) + "\"}");
       } else {
         saveConfig();
-        webServer.send(200, "application/json", "{\"success\":true}");
+        String response;
+        serializeJson(config, response);
+        webServer.send(200, "application/json", response);
       }
     });
 

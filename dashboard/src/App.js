@@ -35,13 +35,11 @@ const theme = createTheme({
 
 function App() {
   const [config, setConfig] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const hostname = process.env.REACT_APP_API_HOST || "localhost";
-  const port = process.env.REACT_APP_API_PORT || 80;
 
   useEffect(() => {
-
-    fetch(`http://${hostname}:${port}/config`)
+    fetch('/config')
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -50,10 +48,38 @@ function App() {
       })
       .then((data) => {
         setConfig(data);
-        console.log("Config:", data);
+        setLoading(false);
       })
-      .catch((error) => console.error('Error loading configuration:', error));
-  }, [port]);
+      .catch((error) => {
+        console.error('Error loading configuration:', error);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  const saveConfig = (newConfig) => {
+    fetch('/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newConfig),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error('Failed to save configuration');
+        return response.json();
+      })
+      .then((savedConfig) => {
+        setConfig(savedConfig);
+        console.log('Configuration saved successfully:', savedConfig);
+        alert('Configuration saved successfully');
+      })
+      .catch((error) => {
+        console.error('Error saving configuration:', error);
+        alert('Failed to save configuration');
+      });
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -73,7 +99,7 @@ function App() {
         }}
       >ESPWiFi</Container>
       <Container>
-        <Settings config={config} />
+        <Settings config={config} saveConfig={saveConfig} />
       </Container>
     </ThemeProvider>
   );
