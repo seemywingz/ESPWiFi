@@ -92,7 +92,7 @@ export default function Pins({ config, saveConfig }) {
                 sx={{
                     position: 'fixed',
                     top: '20px',
-                    left: '20px',
+                    right: '20px',
                 }}>
                 <SettingsIcon />
             </Fab>
