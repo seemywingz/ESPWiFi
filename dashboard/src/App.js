@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import WiFiSettings from './WiFiSettings';
 import APSettings from './APSettings';
 import FileSettings from './FileSettings';
+// import OpenAISettings from './OpenAISettings';
+import GPIOSettings from './GPIO';
 
 var defaultConfig = {
   "version": "0.0.1",
@@ -62,6 +64,8 @@ function App() {
         return <APSettings config={config} saveConfig={saveConfig} />;
       case 'files':
         return <FileSettings />;
+      case 'gpio':
+        return <GPIOSettings config={config} saveConfig={saveConfig} />;
       // case 'openai':
       //   return <OpenAISettings config={config} updateConfig={updateConfig} />;
       // Add other cases as needed
@@ -95,6 +99,7 @@ function App() {
           onChange={(e) => setSelectedSetting(e.target.value)}
         >
           <option value="about">About</option>
+          <option value="gpio">GPIO</option>
           <option value="wifi">WiFi</option>
           <option value="ap">AP</option>
           <option value="openai">OpenAI</option>

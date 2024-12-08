@@ -4,12 +4,12 @@
 #include "ESPWiFi.h"
 
 void ESPWiFi::enableGPIO() {
-  webServer.on("/gpio/on", HTTP_GET, [this]() {
+  webServer.on("/gpio/on", HTTP_POST, [this]() {
     digitalWrite(LED_BUILTIN, HIGH);
     webServer.send(200, "text/plain", "LED on");
   });
 
-  webServer.on("/gpio/off", HTTP_GET, [this]() {
+  webServer.on("/gpio/off", HTTP_POST, [this]() {
     digitalWrite(LED_BUILTIN, LOW);
     webServer.send(200, "text/plain", "LED off");
   });
