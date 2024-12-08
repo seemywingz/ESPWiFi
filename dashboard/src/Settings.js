@@ -65,6 +65,22 @@ export default function Pins({ config, saveConfig }) {
         handleCloseModal();
     };
 
+    const handleRestart = () => {
+        handleModalSubmit();
+
+        fetch('/restart', {
+            method: 'GET',
+        })
+            .then((response) => {
+                if (!response.ok) throw new Error('Failed to reboot');
+                console.log('Restarting...');
+            })
+            .catch((error) => {
+                console.error('Error restarting:', error);
+                alert('Failed to restart');
+            });
+    }
+
     return (
         <Container sx={{
             display: 'flex',
@@ -131,6 +147,7 @@ export default function Pins({ config, saveConfig }) {
                 <DialogActions>
                     <Button onClick={handleCloseModal} color="error">Cancel</Button>
                     <Button onClick={handleModalSubmit} color="primary">Save</Button>
+                    <Button onClick={handleRestart} color="primary">Save & Restart</Button>
                 </DialogActions>
             </Dialog>
         </Container>
