@@ -1,113 +1,82 @@
 import React, { useState, useEffect } from 'react';
-import WiFiSettings from './WiFiSettings';
-import APSettings from './APSettings';
-import FileSettings from './FileSettings';
-// import OpenAISettings from './OpenAISettings';
-import GPIOSettings from './GPIO';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Container from '@mui/material/Container';
+import Pins from './pins/Pins';
+import Settings from './Settings';
 
-var defaultConfig = {
-  "version": "0.0.1",
-  "mode": "client",
-  "mdns": "ESPWiFi",
-  "client": {
-    "ssid": "default-ssid",
-    "password": "default-password"
+// Define the theme
+const theme = createTheme({
+  typography: {
+    fontFamily: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto Slab',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
   },
-  "ap": {
-    "ssid": "ESPWiFi-AP",
-    "password": "default-abc123"
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: "#38ffb9",
+    },
+    secondary: {
+      main: "#333",
+    },
+    error: {
+      main: "#ff3838",
+    },
   },
-  "openAI": {
-    "apiKey": "",
-    "voice": "onyx",
-    "system_message": "You are a helpful assistant."
-  }
-};
+});
 
 function App() {
-  var [config, setConfig] = useState(null);
-  const [selectedSetting, setSelectedSetting] = useState('about');  // Default to 'about'
+  const [config, setConfig] = useState(null);
+
+  const hostname = process.env.REACT_APP_API_HOST || "localhost";
+  const port = process.env.REACT_APP_API_PORT || 80;
 
   useEffect(() => {
-    fetch('/config')
-      .then(response => response.json())
-      .then(data => setConfig(data))
-      .catch(error => console.error('Error loading configuration:', error));
-  }, []);
 
-  const saveConfig = (newConfig) => {
-    fetch('/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newConfig),
-    }).then(response => {
-      if (!response.ok) throw new Error('Failed to save configuration');
-      return response.json();
-    }).then(data => {
-      setConfig(newConfig);
-      console.log('Configuration updated:', data);
-      alert('Configuration updated');
-    }).catch(error => console.error('Error updating configuration:', error));
-  };
-
-  // if (!config) return <div>Loading...</div>;
-
-  if (!config) {
-    config = defaultConfig;
-  }
-
-  const renderSetting = () => {
-    switch (selectedSetting) {
-      case 'wifi':
-        return <WiFiSettings config={config} saveConfig={saveConfig} />;
-      case 'ap':
-        return <APSettings config={config} saveConfig={saveConfig} />;
-      case 'files':
-        return <FileSettings />;
-      case 'gpio':
-        return <GPIOSettings config={config} saveConfig={saveConfig} />;
-      // case 'openai':
-      //   return <OpenAISettings config={config} updateConfig={updateConfig} />;
-      // Add other cases as needed
-      case 'about':
-        return <div class="setting" id="about-settings">
-
-          <div class="setting">
-            <label>Version</label>
-            <label id="version">{config.version}</label>
-          </div>
-
-          <div class="setting">
-            <label>Designed and Developed by:</label>
-            <a href="https://github.com/seemywingz/ESPWiFi"
-              target="_blank" id="SeeMyWingZ" rel="noreferrer">SeeMyWingZ</a>
-          </div>
-
-        </div>;
-      default:
-        return <div>Not implemented</div>;
-    }
-  };
+    fetch(`http://${hostname}:${port}/config`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setConfig(data);
+        console.log("Config:", data);
+      })
+      .catch((error) => console.error('Error loading configuration:', error));
+  }, [port]);
 
   return (
-    <div className="container">
-      <label className="header">ESPWiFi</label>
-      <div className="setting">
-        <select
-          id="settingSelect"
-          className="clickable"
-          onChange={(e) => setSelectedSetting(e.target.value)}
-        >
-          <option value="about">About</option>
-          <option value="gpio">GPIO</option>
-          <option value="wifi">WiFi</option>
-          <option value="ap">AP</option>
-          <option value="openai">OpenAI</option>
-          <option value="files">Files</option>
-        </select>
-      </div>
-      {renderSetting()}
-    </div>
+    <ThemeProvider theme={theme}>
+      <Container
+        sx={{
+          fontFamily: 'Roboto Slab',
+          backgroundColor: 'secondary.light',
+          color: 'primary.main',
+          fontSize: '3em',
+          height: '9vh',
+          zIndex: 1000,
+          textAlign: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minWidth: '100%',
+        }}
+      >ESPWiFi</Container>
+      <Container>
+        <Settings config={config} />
+      </Container>
+    </ThemeProvider>
   );
 }
 
