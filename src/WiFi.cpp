@@ -74,4 +74,14 @@ void ESPWiFi::handleClient() {
 #endif
 }
 
+void ESPWiFi::startMDNS() {
+  String domain = config["mdns"];
+  if (!MDNS.begin(domain)) {
+    Serial.println("Error setting up MDNS responder!");
+  } else {
+    MDNS.addService("http", "tcp", 80);
+    Serial.println("\tDomain Name: " + domain + ".local");
+  }
+}
+
 #endif  // ESPWIFI_WIFI_H

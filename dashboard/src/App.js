@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Container from '@mui/material/Container';
+import { LinearProgress } from '@mui/material';
 import Settings from './Settings';
 
 // Define the theme
@@ -57,7 +58,7 @@ function App() {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LinearProgress color="inherit" />
   }
 
   const saveConfig = (newConfig) => {
