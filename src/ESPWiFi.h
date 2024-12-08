@@ -37,7 +37,7 @@ class ESPWiFi {
 
   WebServer webServer;
 
-  int maxConnectAttempts = 10;
+  int maxConnectAttempts = 18;
 
   void (*connectSubroutine)() = nullptr;
 
