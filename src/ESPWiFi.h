@@ -157,6 +157,9 @@ class ESPWiFi {
   void runAtInterval(unsigned int interval, unsigned long& lastIntervalRun,
                      std::function<void()> functionToRun);
 
+  // GPIO
+  void enableGPIO();
+
   // Audio
   void startAudio();
   void handleAudio();
@@ -171,6 +174,7 @@ class ESPWiFi {
   String openAI_Chat(String text);
   void openAI_TTS(String text, String filePath);
 
+  // #############################################################################################################
  private:
   void startMDNS() {
     String domain = config["mdns"];
