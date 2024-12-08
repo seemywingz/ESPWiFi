@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Container from '@mui/material/Container';
-import Pins from './pins/Pins';
 import Settings from './Settings';
 
 // Define the theme
