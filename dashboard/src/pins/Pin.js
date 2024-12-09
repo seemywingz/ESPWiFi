@@ -8,13 +8,13 @@ import OutputIcon from '@mui/icons-material/Output';
 import InputIcon from '@mui/icons-material/Input';
 import BuildIcon from '@mui/icons-material/Build'; // Generic icon for modes without a specific icon
 
-export default function Pin({ pinNum, props, onUpdate, config }) {
-    const [isOn, setIsOn] = useState(props.on);
-    const [name, setName] = useState(props.name);
-    const [mode, setMode] = useState(props.mode);
-    const [hz, setHz] = useState(props.hz || 50); // Default frequency to 4688 if undefined
-    const [duty, setDuty] = useState(props.duty || 0); // Default duty length to 0 if undefined
-    const [cycle, setCycle] = useState(props.cycle || 20000); // Default cycle length to 128 if undefined
+export default function Pin({ config, pinNum, props, updatePins }) {
+    const [isOn, setIsOn] = useState(props.state === "high"); // Initialize with a boolean
+    const [name, setName] = useState(props.name || "Pin"); // Default to pin
+    const [mode, setMode] = useState(props.mode || "out"); // Default to "out"
+    const [hz, setHz] = useState(props.hz || 50); // Default to 50
+    const [duty, setDuty] = useState(props.duty || 0); // Default to 0
+    const [cycle, setCycle] = useState(props.cycle || 20000); // Default to 20000
     const [anchorEl, setAnchorEl] = useState(null);
     const [dutyMax, setDutyMax] = useState(2500);
     const [dutyMin, setDutyMin] = useState(550);
@@ -22,22 +22,45 @@ export default function Pin({ pinNum, props, onUpdate, config }) {
 
     const updatePinState = (newState) => {
         const pinState = {
-            on: isOn,
+            num: parseInt(pinNum, 10), // Ensure `num` is included and parsed as a number
             name: name,
-            num: parseInt(pinNum, 10),
             mode: mode,
-            hz: parseInt(hz, 10),
+            hz: hz,
             duty: duty,
             cycle: cycle,
-            ...newState, // Override with any new state values passed
+            state: isOn ? "high" : "low", // Map the current "on" state to "state"
+            ...newState, // Merge any additional state values
         };
-        onUpdate(pinState, "POST");
+        fetch(`${config.apiURL}/gpio`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                cycle: pinState.cycle,
+                duty: pinState.duty,
+                hz: pinState.hz,
+                mode: pinState.mode,
+                name: pinState.name,
+                state: pinState.state,
+                num: pinState.num
+            }),
+        }).then((response) => {
+            if (!response.ok) {
+                throw new Error("Failed to update pin state");
+            }
+            return response.json();
+        }).then((data) => {
+            updatePins(pinState); // Call the parent's `handleUpdatePin`
+        }).catch((error) => {
+            console.error("Error updating pin state:", error);
+        });
     };
 
     const handleChange = (event) => {
         const newIsOn = event.target.checked;
         setIsOn(newIsOn);
-        updatePinState({ on: newIsOn });
+        updatePinState({ state: newIsOn ? "high" : "low" }); // Pass updated `state`
     };
 
     const handleNameChange = (event) => {
@@ -62,7 +85,7 @@ export default function Pin({ pinNum, props, onUpdate, config }) {
         const pinState = {
             num: parseInt(pinNum, 10),
         };
-        onUpdate(pinState, "DELETE");
+        updatePinState(pinState, "DELETE");
         handleMenuClose();
     };
 
@@ -181,14 +204,6 @@ export default function Pin({ pinNum, props, onUpdate, config }) {
                             <MenuItem value="in">Input</MenuItem>
                             <MenuItem value="out">Output</MenuItem>
                             <MenuItem value="pwm">PWM</MenuItem>
-                            <MenuItem value="spi">SPI</MenuItem>
-                            <MenuItem value="clock">Clock</MenuItem>
-                            <MenuItem value="alt0">Alt0</MenuItem>
-                            <MenuItem value="alt1">Alt1</MenuItem>
-                            <MenuItem value="alt2">Alt2</MenuItem>
-                            <MenuItem value="alt3">Alt3</MenuItem>
-                            <MenuItem value="alt4">Alt4</MenuItem>
-                            <MenuItem value="alt5">Alt5</MenuItem>
                         </Select>
                     </FormControl>
                 </MenuItem>
@@ -241,7 +256,7 @@ export default function Pin({ pinNum, props, onUpdate, config }) {
             <FormControlLabel
                 labelPlacement="top"
                 label={name || pinNum}
-                control={<Switch checked={isOn} onChange={handleChange} disabled={props.mode === "in"} />}
+                control={<Switch checked={!!isOn} onChange={handleChange} disabled={props.mode === "in"} />}
                 value={isOn}
             />
 

@@ -77,9 +77,9 @@ class ESPWiFi {
 
   // WiFi
   void connectToWifi();
-  int selectBestChannel();
-  void startAP();
   void handleClient();
+  void startAP();
+  int selectBestChannel();
 
   // Utils
   String getContentType(String filename);
@@ -112,6 +112,7 @@ class ESPWiFi {
  private:
   void startMDNS();
   void startWebServer();
+  void handleCorsPreflight();
   void listFilesHandler();
 };
 #endif  // ESPWiFi_h

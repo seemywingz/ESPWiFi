@@ -40,8 +40,13 @@ function App() {
   const [loading, setLoading] = useState(true);
 
 
+  const hostname = process.env.REACT_APP_API_HOST || "localhost";
+  const port = process.env.REACT_APP_API_PORT || 80;
+  const apiURL = process.env.NODE_ENV === 'production' ? "" : `http://${hostname}:${port}`;
+
+
   useEffect(() => {
-    fetch('/config')
+    fetch(apiURL + '/config')
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -49,6 +54,7 @@ function App() {
         return response.json();
       })
       .then((data) => {
+        data.apiURL = apiURL;
         setConfig(data);
         setLoading(false);
       })
@@ -64,7 +70,7 @@ function App() {
   }
 
   const saveConfig = (newConfig) => {
-    fetch('/config', {
+    fetch(apiURL + '/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newConfig),
@@ -76,7 +82,6 @@ function App() {
       .then((savedConfig) => {
         setConfig(savedConfig);
         console.log('Configuration saved successfully:', savedConfig);
-        alert('Configuration saved successfully');
       })
       .catch((error) => {
         console.error('Error saving configuration:', error);
@@ -103,7 +108,7 @@ function App() {
       >ESPWiFi</Container>
       <Container>
         <Settings config={config} saveConfig={saveConfig} />
-        <Pins config={config} />
+        <Pins config={config} saveConfig={saveConfig} />
       </Container>
     </ThemeProvider>
   );

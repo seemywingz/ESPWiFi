@@ -3,7 +3,7 @@ import Pin from "./Pin";
 import { Container, Fab, Dialog, DialogTitle, DialogContent, DialogActions, Button, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 
-export default function Pins({ config }) {
+export default function Pins({ config, saveConfig }) {
     const [pins, setPins] = useState({}); // Initialize with an empty object
     const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
     const [selectedPinNum, setSelectedPinNum] = useState(""); // Selected pin number in modal
@@ -14,38 +14,14 @@ export default function Pins({ config }) {
         }
     }, [config]);
 
-    const handleDeletePin = (pinNum) => {
+    const handleUpdatePin = (pinState) => {
         const updatedPins = { ...pins };
-        delete updatedPins[pinNum];
+        updatedPins[pinState.num] = pinState;
         setPins(updatedPins);
-        setSelectedPinNum(""); // Clear the selection when a pin is deleted
+        saveConfig({ ...config, pins: updatedPins });
     };
 
-    const handleUpdatePin = (pinState, method) => {
-        fetch(`http://${config.hostname}:${config.port}/api/pin`, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(pinState),
-        }).then(response => {
-            if (response.ok) {
-                if (method === "DELETE") {
-                    handleDeletePin(pinState.num);
-                } else if (method === "POST" || method === "PUT") {
-                    setPins(prevPins => ({
-                        ...prevPins,
-                        [pinState.num]: pinState,
-                    }));
-                }
-                setSelectedPinNum(""); // Clear the selection after a successful update
-            }
-        }).catch(error => {
-            console.error('Error updating pin:', error);
-        });
-    };
-
-    const handleFabClick = () => {
+    const handleAddBtnClick = () => {
         setSelectedPinNum(""); // Reset the selected pin number
         setIsModalOpen(true); // Open the modal when the Fab button is pressed
     };
@@ -62,7 +38,7 @@ export default function Pins({ config }) {
             num: parseInt(selectedPinNum, 10),
             mode: "out", // Default mode
         };
-        handleUpdatePin(newPinState, "PUT");
+        handleUpdatePin(newPinState);
         handleCloseModal(); // Close the modal after submission
     };
 
@@ -88,7 +64,7 @@ export default function Pins({ config }) {
     // Map over the keys of the pins object
     const pinElements = Object.keys(pins).map((key) => {
         const pin = pins[key];
-        return <Pin key={key} config={config} pinNum={key} props={pin} onUpdate={handleUpdatePin} />;
+        return <Pin key={key} config={config} pinNum={key} props={pin} updatePins={handleUpdatePin} />;
     });
 
     return (
@@ -98,7 +74,7 @@ export default function Pins({ config }) {
             justifyContent: 'center',
         }}>
             <Fab size="small" color="primary" aria-label="add"
-                onClick={handleFabClick}
+                onClick={handleAddBtnClick}
                 sx={{
                     position: 'fixed',
                     top: '20px',
