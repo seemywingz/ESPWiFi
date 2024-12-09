@@ -24,7 +24,7 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: "#38ffb9",
+      main: "#3effc1",
     },
     secondary: {
       main: "#333",
@@ -105,7 +105,7 @@ function App() {
           justifyContent: 'center',
           minWidth: '100%',
         }}
-      >ESPWiFi</Container>
+      >{config['mdns']}</Container>
       <Container>
         <Settings config={config} saveConfig={saveConfig} />
         <Pins config={config} saveConfig={saveConfig} />

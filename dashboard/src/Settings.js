@@ -5,6 +5,7 @@ import SettingsIcon from '@mui/icons-material/Settings'; // Import gear icon
 export default function Pins({ config, saveConfig }) {
     const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
     const [ssid, setSsid] = useState(""); // State for WiFi SSID
+    const [mdns, setMdns] = useState(config['mdns']); // State for mDNS hostname
     const [password, setPassword] = useState(""); // State for WiFi password
     const [apSsid, setApSsid] = useState(""); // State for Access Point SSID
     const [apPassword, setApPassword] = useState(""); // State for Access Point password
@@ -48,11 +49,25 @@ export default function Pins({ config, saveConfig }) {
         setMode(event.target.checked ? 'client' : 'ap');
     };
 
-    const handleModalSubmit = () => {
+    const handleMDNSChange = (event) => {
+        setMdns(event.target.value);
+    }
+
+    const isValidHostname = (hostname) => {
+        const regex = /^(?!-)[A-Za-z0-9-]{1,63}(?<!-)$/;
+        return regex.test(hostname);
+    };
+
+    const handleSave = () => {
+        if (!isValidHostname(mdns)) {
+            alert('Invalid mDNS hostname. Please enter a valid hostname.');
+            return;
+        }
         // Handle the submit action
         saveConfig({
             ...config,
             mode: mode,
+            mdns: mdns,
             client: {
                 ssid: ssid,
                 password: password,
@@ -66,7 +81,7 @@ export default function Pins({ config, saveConfig }) {
     };
 
     const handleRestart = () => {
-        handleModalSubmit();
+        handleSave();
 
         fetch('/restart', {
             method: 'GET',
@@ -100,6 +115,15 @@ export default function Pins({ config, saveConfig }) {
             <Dialog open={isModalOpen} onClose={handleCloseModal}>
                 <DialogTitle>Settings</DialogTitle>
                 <DialogContent>
+                    <FormControl fullWidth variant="outlined" sx={{ marginTop: 1 }}>
+                        <TextField
+                            label="mDNS Hostname"
+                            value={mdns}
+                            onChange={handleMDNSChange}
+                            variant="outlined"
+                            fullWidth
+                        />
+                    </FormControl>
                     <FormControl variant="outlined" sx={{ marginTop: 1 }}>
                         <FormControlLabel
                             control={<Switch checked={mode === 'client'} onChange={handleModeToggle} />}
@@ -146,7 +170,7 @@ export default function Pins({ config, saveConfig }) {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseModal} color="error">Cancel</Button>
-                    <Button onClick={handleModalSubmit} color="primary">Save</Button>
+                    <Button onClick={handleSave} color="primary">Save</Button>
                     <Button onClick={handleRestart} color="primary">Save & Restart</Button>
                 </DialogActions>
             </Dialog>
