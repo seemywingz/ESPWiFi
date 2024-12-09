@@ -47,4 +47,11 @@ void ESPWiFi::defaultConfig() {
   config["client"]["password"] = "";
 }
 
+void ESPWiFi::resetConfig() {
+  defaultConfig();
+  saveConfig();
+  delay(1000);
+  ESP.restart();
+}
+
 #endif  // ESPWIFI_CONFIG_H

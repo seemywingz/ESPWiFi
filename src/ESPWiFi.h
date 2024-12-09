@@ -74,6 +74,7 @@ class ESPWiFi {
   void saveConfig();
   void readConfig();
   void defaultConfig();
+  void resetConfig();
 
   // WiFi
   void connectToWifi();
