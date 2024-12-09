@@ -91,7 +91,7 @@ export default function Pins({ config }) {
                 sx={{
                     position: 'fixed',
                     top: '20px',
-                    left: '20px',
+                    right: '20px',
                 }}>
                 <AddIcon />
             </Fab>

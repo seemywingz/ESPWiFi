@@ -3,6 +3,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import LinearProgress from '@mui/material/LinearProgress';
 import Settings from './Settings';
+import Pins from './pins/Pins';
 
 // Define the theme
 const theme = createTheme({
@@ -102,6 +103,7 @@ function App() {
       >ESPWiFi</Container>
       <Container>
         <Settings config={config} saveConfig={saveConfig} />
+        <Pins config={config} />
       </Container>
     </ThemeProvider>
   );
