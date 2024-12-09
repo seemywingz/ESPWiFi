@@ -1,0 +1,88 @@
+#!/bin/bash
+
+SRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+. $SCRIPT_DIR/utils
+
+TMP_FILE="/tmp/tmp-$(date +%s)-esp-fs.bin"
+trap "rm -f $TMP_FILE" EXIT
+
+PAGE_SIZE="256"
+BLOCK_SIZE="8192"
+IMAGE_SIZE=2072576
+PARTITION_OFFSET="2097152"
+
+ESPTOOL_ARGS=""
+ESP_PYTHON="/Users/kjj/Library/Arduino15/packages/esp8266/tools/python3/3.7.2-post1/python3"
+ESP_UPLOAD_TOOL="/Users/kjj/Library/Arduino15/packages/esp8266/hardware/esp8266/3.1.2/tools/upload.py"
+# ESP_UPLOAD_TOOL="/Users/kjj/Library/Arduino15/packages/esp8266/hardware/esp8266/3.1.2/tools/esptool/esptool.py"
+ESP_MKFS_TOOL="/Users/kjj/Library/Arduino15/packages/esp8266/tools/mklittlefs/3.1.0-gcc10.3-e5f9fec/mklittlefs"
+
+# Default values
+DATA_DIR="data"
+CHIP_TYPE="auto" # {auto,esp8266,esp32,esp32s2,esp32s3beta2,esp32c3}
+# CHIP_BAUD="115200"
+CHIP_BAUD="921600"
+SERIAL_DEV="/dev/tty.usbserial-"
+SERIAL_PORT=""
+
+# Parse options
+while getopts "d:p:e" opt; do
+    case $opt in
+    d) DATA_DIR="$OPTARG" ;;
+    p) SERIAL_PORT="$OPTARG" ;;
+    e)
+        ESP_PYTHON=""
+        ESP_UPLOAD_TOOL="/Users/kjj/Library/Arduino15/packages/esp32/tools/esptool_py/4.5.1/esptool"
+        # ESP_MKFS_TOOL="/Users/kjj/Library/Arduino15/packages/esp32/tools/mkspiffs/0.2.3/mkspiffs"
+        ESP_MKFS_TOOL="/Users/kjj/Library/Arduino15/packages/esp32/tools/mklittlefs/3.0.0-gnu12-dc7f933/mklittlefs"
+        BLOCK_SIZE="4096"
+        # /Users/kjj/Library/Arduino15/packages/esp32/hardware/esp32/2.0.16/tools/partitions
+        CHIP_BAUD="115200"
+        IMAGE_SIZE="0x160000"
+        ESPTOOL_ARGS="-z"
+        PARTITION_OFFSET="0x290000"
+        # ${ESP_UPLOAD_TOOL} --chip auto erase_flash
+        ;;
+    \?)
+        echo "${RED}Invalid option: -$OPTARG" >&2
+        echo "${WHT}Usage: $0 -d <data_directory> [-p <serial_port>]"
+        return 1
+        ;;
+    esac
+done
+
+echo "${YEL}📦  Packaging Files to Upload${WHT}"
+$ESP_MKFS_TOOL \
+    --create $DATA_DIR \
+    --page $PAGE_SIZE \
+    --size $IMAGE_SIZE \
+    --block $BLOCK_SIZE \
+    $TMP_FILE
+echo ""
+
+# List available serial ports if none provided
+if [ -z $SERIAL_PORT ]; then
+    SERIAL_PORTS=($(ls /dev/tty.* | grep -i usb))
+    # Check if there are available ports
+    if [ ${#SERIAL_PORTS[@]} -eq 0 ]; then
+        echo -e "${RED}🚫 No serial ports found. Please connect a device.${NC}"
+        return 1
+    elif [ ${#SERIAL_PORTS[@]} -eq 1 ]; then
+        SERIAL_PORT="${SERIAL_PORTS}"
+    else
+        echo -e "${YEL}☑️  Select Serial Port:${PURP}"
+        select port in "${SERIAL_PORTS[@]}"; do
+            SERIAL_PORT="$port"
+            echo -e "${WHT}"
+            break
+        done
+    fi
+fi
+echo -e "${YEL}🛜  Uploading Packaged Files${WHT}"
+$ESP_PYTHON $ESP_UPLOAD_TOOL \
+    --before default_reset \
+    --after hard_reset \
+    --chip $CHIP_TYPE \
+    --port $SERIAL_PORT \
+    --baud $CHIP_BAUD \
+    write_flash $ESPTOOL_ARGS $PARTITION_OFFSET $TMP_FILE
