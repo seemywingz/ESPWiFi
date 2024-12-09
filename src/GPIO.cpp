@@ -6,18 +6,6 @@
 #include "ESPWiFi.h"
 
 void ESPWiFi::enableGPIO() {
-  webServer.on("/gpio/on", HTTP_POST, [this]() {
-    digitalWrite(LED_BUILTIN, HIGH);
-    webServer.sendHeader("Access-Control-Allow-Origin", "*");
-    webServer.send(200, "text/plain", "LED on");
-  });
-
-  webServer.on("/gpio/off", HTTP_POST, [this]() {
-    digitalWrite(LED_BUILTIN, LOW);
-    webServer.sendHeader("Access-Control-Allow-Origin", "*");
-    webServer.send(200, "text/plain", "LED off");
-  });
-
   webServer.on("/gpio", HTTP_OPTIONS, [this]() { handleCorsPreflight(); });
   webServer.on("/gpio", HTTP_POST, [this]() {
     String body = webServer.arg("plain");

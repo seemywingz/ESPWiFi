@@ -42,7 +42,7 @@ void ESPWiFi::defaultConfig() {
   config["ap"]["ssid"] = "ESPWiFi-" + String(ESP.getEfuseMac(), HEX);
 #endif
   config["ap"]["password"] = "abcd1234";
-  config["mdns"] = "espwifi";
+  config["mdns"] = "ESPWiFi";
   config["client"]["ssid"] = "";
   config["client"]["password"] = "";
 }
