@@ -93,7 +93,7 @@ class ESPWiFi {
                      std::function<void()> functionToRun);
 
   // GPIO
-  void enableGPIO();
+  void startGPIO();
 
   // Audio
   void startAudio();
