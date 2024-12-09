@@ -70,9 +70,20 @@ export default function Pins({ config }) {
         setSelectedPinNum(event.target.value); // Update selected pin number
     };
 
-    // Generate an array of pin numbers from 0 to 25, excluding the ones already in use
-    const pinOptions = Array.from({ length: 26 }, (_, index) => index)
-        .filter(pinNum => !pins.hasOwnProperty(pinNum.toString())); // Exclude pins already implemented
+    const esp8266Pins = [
+        { label: "D0 (GPIO16)", value: 16 },
+        { label: "D1 (GPIO5)", value: 5 },
+        { label: "D2 (GPIO4)", value: 4 },
+        { label: "D3 (GPIO0)", value: "0" },
+        { label: "D4 (GPIO2)", value: 2 },
+        { label: "D5 (GPIO14)", value: 14 },
+        { label: "D6 (GPIO12)", value: 12 },
+        { label: "D7 (GPIO13)", value: 13 },
+        { label: "D8 (GPIO15)", value: 15 },
+        { label: "A0 (Analog)", value: "A0" } // Assuming 17 for analog pin
+    ];
+
+    const pinOptions = esp8266Pins.filter(pin => !pins.hasOwnProperty(pin.value.toString()));
 
     // Map over the keys of the pins object
     const pinElements = Object.keys(pins).map((key) => {
@@ -101,16 +112,16 @@ export default function Pins({ config }) {
             <Dialog open={isModalOpen} onClose={handleCloseModal}>
                 <DialogTitle>Add Pin</DialogTitle>
                 <DialogContent>
-                    <FormControl fullWidth variant="outlined" sx={{ marginTop: 1 }}> {/* Add margin to move the Select down */}
-                        <InputLabel id="pin-select-label">Pin Number</InputLabel>
+                    <FormControl fullWidth variant="outlined" sx={{ marginTop: 1 }}>
+                        <InputLabel id="pin-select-label">Pin</InputLabel>
                         <Select
                             labelId="pin-select-label"
                             value={selectedPinNum || ""}
                             label="Pin Number"
                             onChange={handlePinNumberChange}
                         >
-                            {pinOptions.map(pinNum => (
-                                <MenuItem key={pinNum} value={pinNum}>{pinNum}</MenuItem>
+                            {pinOptions.map(pin => (
+                                <MenuItem key={pin.value} value={pin.value}>{pin.label}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>
