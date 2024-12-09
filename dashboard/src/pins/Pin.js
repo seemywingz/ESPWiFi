@@ -16,14 +16,14 @@ export default function Pin({ config, pinNum, props, updatePins }) {
     const [duty, setDuty] = useState(props.duty || 0); // Default to 0
     const [cycle, setCycle] = useState(props.cycle || 20000); // Default to 20000
     const [anchorEl, setAnchorEl] = useState(null);
-    const [dutyMax, setDutyMax] = useState(2500);
-    const [dutyMin, setDutyMin] = useState(550);
+    const [dutyMax, setDutyMax] = useState(255);
+    const [dutyMin, setDutyMin] = useState(0);
     const containerRef = useRef(null);
 
-    const updatePinState = (newState) => {
+    const updatePinState = (newState, deletePin) => {
         const pinState = {
-            num: parseInt(pinNum, 10), // Ensure `num` is included and parsed as a number
             name: name,
+            num: parseInt(pinNum, 10),
             mode: mode,
             hz: hz,
             duty: duty,
@@ -40,9 +40,9 @@ export default function Pin({ config, pinNum, props, updatePins }) {
                 cycle: pinState.cycle,
                 duty: pinState.duty,
                 hz: pinState.hz,
-                mode: pinState.mode,
+                mode: deletePin ? "in" : pinState.mode,
                 name: pinState.name,
-                state: pinState.state,
+                state: deletePin ? "low" : pinState.state,
                 num: pinState.num
             }),
         }).then((response) => {
@@ -51,7 +51,7 @@ export default function Pin({ config, pinNum, props, updatePins }) {
             }
             return response.json();
         }).then((data) => {
-            updatePins(pinState); // Call the parent's `handleUpdatePin`
+            updatePins(pinState, deletePin); // Call the parent's `handleUpdatePin`
         }).catch((error) => {
             console.error("Error updating pin state:", error);
         });
@@ -204,6 +204,12 @@ export default function Pin({ config, pinNum, props, updatePins }) {
                             <MenuItem value="in">Input</MenuItem>
                             <MenuItem value="out">Output</MenuItem>
                             <MenuItem value="pwm">PWM</MenuItem>
+                            {/* <MenuItem value="alt0">Alt0</MenuItem>
+                            <MenuItem value="alt1">Alt1</MenuItem>
+                            <MenuItem value="alt2">Alt2</MenuItem>
+                            <MenuItem value="alt3">Alt3</MenuItem>
+                            <MenuItem value="alt4">Alt4</MenuItem>
+                            <MenuItem value="alt5">Alt5</MenuItem> */}
                         </Select>
                     </FormControl>
                 </MenuItem>

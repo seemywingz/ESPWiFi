@@ -11,8 +11,18 @@
         "password": "abcd1234"
     },
     "openAI": {
-        "apiKey" : "",
+        "apiKey": "",
         "voice": "onyx",
         "system_message": "You are a helpful assistant. On an ESP Micro Controller."
+    },
+    "pins": {
+        "2": {
+            "cycle": 20000,
+            "duty": 1860,
+            "hz": 50,
+            "mode": "out",
+            "name": "Pin 2",
+            "state": "high"
+        }
     }
 }

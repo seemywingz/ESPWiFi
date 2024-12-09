@@ -47,21 +47,25 @@ void ESPWiFi::enableGPIO() {
       return;
     }
 
-    if (mode == "pwm") {
-      analogWrite(num, duty);
-    } else if (state == "high") {
-      digitalWrite(num, HIGH);
+    if (state == "high") {
+      if (mode == "pwm") {
+        analogWrite(num, duty);
+      } else {
+        digitalWrite(num, HIGH);
+      }
     } else if (state == "low") {
       digitalWrite(num, LOW);
     } else {
       webServer.send(400, "application/json",
                      "{\"error\":\"Invalid state\" : \"" + state + "\"}");
+
       return;
     }
 
     webServer.sendHeader("Access-Control-Allow-Origin", "*");
     webServer.send(200, "application/json", "{\"status\":\"Success\"}");
-    Serial.println("GPIO " + String(num) + " " + mode + " " + state);
+    Serial.println("GPIO " + String(num) + " " + mode + " " + state + " " +
+                   String(duty));
   });
 }
 

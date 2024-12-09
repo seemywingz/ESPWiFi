@@ -8,13 +8,43 @@ export default function Pins({ config, saveConfig }) {
     const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
     const [selectedPinNum, setSelectedPinNum] = useState(""); // Selected pin number in modal
 
+    // Define available ESP8266 pins
+    const esp8266Pins = [
+        { label: "D0 (GPIO16)", value: 16 },
+        { label: "D1 (GPIO5)", value: 5 },
+        { label: "D2 (GPIO4)", value: 4 },
+        { label: "D3 (GPIO0)", value: "0" },
+        { label: "D4 (GPIO2)", value: 2 },
+        { label: "D5 (GPIO14)", value: 14 },
+        { label: "D6 (GPIO12)", value: 12 },
+        { label: "D7 (GPIO13)", value: 13 },
+        { label: "D8 (GPIO15)", value: 15 },
+        { label: "A0 (Analog)", value: "A0" },
+    ];
+
+    // Filter available pins
+    const pinOptions = esp8266Pins.filter(pin => !Object.keys(pins).includes(pin.value.toString()));
+
     useEffect(() => {
         if (config && config.pins) {
             setPins(config.pins);
         }
     }, [config]);
 
-    const handleUpdatePin = (pinState) => {
+    useEffect(() => {
+        if (pinOptions.length > 0 && !pinOptions.some(pin => pin.value === selectedPinNum)) {
+            setSelectedPinNum(pinOptions[0].value); // Default to the first available pin
+        }
+    }, [pinOptions, selectedPinNum]);
+
+    const updatePins = (pinState, deletePin) => {
+        if (deletePin) {
+            const updatedPins = { ...pins };
+            delete updatedPins[pinState.num];
+            setPins(updatedPins);
+            saveConfig({ ...config, pins: updatedPins });
+            return;
+        }
         const updatedPins = { ...pins };
         updatedPins[pinState.num] = pinState;
         setPins(updatedPins);
@@ -30,15 +60,17 @@ export default function Pins({ config, saveConfig }) {
         setIsModalOpen(false); // Close the modal
     };
 
-    const handleModalSubmit = () => {
-        // Create a new pin state and call handleUpdatePin with PUT method
+    const handleAddPin = () => {
         const newPinState = {
-            on: false,
+            state: "low",
             name: `Pin ${selectedPinNum}`,
             num: parseInt(selectedPinNum, 10),
             mode: "out", // Default mode
+            duty: 1860,
+            cycle: 20000,
+            hz: 50,
         };
-        handleUpdatePin(newPinState);
+        updatePins(newPinState);
         handleCloseModal(); // Close the modal after submission
     };
 
@@ -46,40 +78,21 @@ export default function Pins({ config, saveConfig }) {
         setSelectedPinNum(event.target.value); // Update selected pin number
     };
 
-    const esp8266Pins = [
-        { label: "D0 (GPIO16)", value: 16 },
-        { label: "D1 (GPIO5)", value: 5 },
-        { label: "D2 (GPIO4)", value: 4 },
-        { label: "D3 (GPIO0)", value: "0" },
-        { label: "D4 (GPIO2)", value: 2 },
-        { label: "D5 (GPIO14)", value: 14 },
-        { label: "D6 (GPIO12)", value: 12 },
-        { label: "D7 (GPIO13)", value: 13 },
-        { label: "D8 (GPIO15)", value: 15 },
-        { label: "A0 (Analog)", value: "A0" } // Assuming 17 for analog pin
-    ];
-
-    const pinOptions = esp8266Pins.filter(pin => !pins.hasOwnProperty(pin.value.toString()));
-
     // Map over the keys of the pins object
     const pinElements = Object.keys(pins).map((key) => {
         const pin = pins[key];
-        return <Pin key={key} config={config} pinNum={key} props={pin} updatePins={handleUpdatePin} />;
+        return <Pin key={key} config={config} pinNum={key} props={pin} updatePins={updatePins} />;
     });
 
     return (
-        <Container sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-        }}>
-            <Fab size="small" color="primary" aria-label="add"
+        <Container sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Fab
+                size="small"
+                color="primary"
+                aria-label="add"
                 onClick={handleAddBtnClick}
-                sx={{
-                    position: 'fixed',
-                    top: '20px',
-                    right: '20px',
-                }}>
+                sx={{ position: 'fixed', top: '20px', right: '20px' }}
+            >
                 <AddIcon />
             </Fab>
 
@@ -92,7 +105,7 @@ export default function Pins({ config, saveConfig }) {
                         <InputLabel id="pin-select-label">Pin</InputLabel>
                         <Select
                             labelId="pin-select-label"
-                            value={selectedPinNum || ""}
+                            value={pinOptions.some(pin => pin.value === selectedPinNum) ? selectedPinNum : ""}
                             label="Pin Number"
                             onChange={handlePinNumberChange}
                         >
@@ -104,9 +117,10 @@ export default function Pins({ config, saveConfig }) {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseModal} color="error">Cancel</Button>
-                    <Button onClick={handleModalSubmit} color="primary" disabled={!selectedPinNum}>Add Pin</Button>
+                    <Button onClick={handleAddPin} color="primary" disabled={!selectedPinNum}>Add Pin</Button>
                 </DialogActions>
             </Dialog>
         </Container>
     );
 }
+
