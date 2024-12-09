@@ -7,6 +7,7 @@ export default function Pins({ config, saveConfig }) {
     const [pins, setPins] = useState({}); // Initialize with an empty object
     const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
     const [selectedPinNum, setSelectedPinNum] = useState(""); // Selected pin number in modal
+    const [selectedPinLabel, setSelectedPinLabel] = useState(""); // Selected pin label in modal
 
     // Define available ESP8266 pins
     const esp8266Pins = [
@@ -63,7 +64,7 @@ export default function Pins({ config, saveConfig }) {
     const handleAddPin = () => {
         const newPinState = {
             state: "low",
-            name: `Pin ${selectedPinNum}`,
+            name: selectedPinLabel,
             num: parseInt(selectedPinNum, 10),
             mode: "out", // Default mode
             duty: 1860,
@@ -75,7 +76,10 @@ export default function Pins({ config, saveConfig }) {
     };
 
     const handlePinNumberChange = (event) => {
-        setSelectedPinNum(event.target.value); // Update selected pin number
+        const selectedValue = event.target.value;
+        const selectedLabel = esp8266Pins.find(pin => pin.value === selectedValue)?.label || "";
+        setSelectedPinNum(selectedValue); // Update selected pin number
+        setSelectedPinLabel(selectedLabel); // Update selected pin label
     };
 
     // Map over the keys of the pins object

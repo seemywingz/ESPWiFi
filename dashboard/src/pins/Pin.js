@@ -101,17 +101,6 @@ export default function Pin({ config, pinNum, props, updatePins }) {
         updatePinState({ hz: newFrequency });
     };
 
-    const handleDutyChange = (event, newValue) => {
-        setDuty(newValue);
-        if (mode === "servo") {
-            setCycle(cycle);
-            setHz(hz);
-            updatePinState({ duty: newValue });
-        } else {
-            updatePinState({ duty: newValue });
-        }
-    };
-
     const handleCycleChange = (event, newValue) => {
         setCycle(newValue);
         updatePinState({ cycle: newValue });
@@ -270,7 +259,10 @@ export default function Pin({ config, pinNum, props, updatePins }) {
                 <Container sx={{ marginTop: '10px' }}>
                     <Slider
                         value={duty}
-                        onChange={handleDutyChange}
+                        onChange={(event, newValue) => setDuty(newValue)} // Update local state while dragging
+                        onChangeCommitted={(event, newValue) => {
+                            updatePinState({ duty: newValue }); // Update only when slider is released
+                        }}
                         aria-labelledby="duty-length-slider"
                         min={Number(dutyMin)}
                         max={Number(dutyMax)}

@@ -17,12 +17,22 @@
     },
     "pins": {
         "2": {
-            "cycle": 20000,
-            "duty": 1860,
-            "hz": 50,
+            "name": "D4 (GPIO2)",
+            "num": 2,
             "mode": "out",
-            "name": "Pin 2",
+            "hz": 50,
+            "duty": 1860,
+            "cycle": 20000,
             "state": "high"
+        },
+        "5": {
+            "name": "D1 (GPIO5)",
+            "num": 5,
+            "mode": "pwm",
+            "hz": 50,
+            "duty": 1860,
+            "cycle": 20000,
+            "state": "low"
         }
     }
 }
