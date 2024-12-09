@@ -18,10 +18,10 @@ report_status() {
         echo -e "${RED}🚫 Error:${WHT} $message${NC}"
         ;;
     success)
-        echo -e "${YEL}✅ $message${WHT}${NC}"
+        echo -e "${GRN}$message${WHT}${NC}\n"
         ;;
     *)
-        echo -e "${WHT}ℹ️  $message${NC}"
+        echo -e "${WHT}$message${NC}"
         ;;
     esac
 }
