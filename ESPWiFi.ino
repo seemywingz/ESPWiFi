@@ -6,7 +6,7 @@ ESPWiFi wifi;
 
 void setup() {
   wifi.start();
-  wifi.enableGPIO();
+  wifi.startGPIO();
   // wifi.startAudio();
   // String response = wifi.openAI_Chat("Hello, world!");
   // wifi.openAI_TTS(response, "/hello.mp3");

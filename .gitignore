@@ -2,4 +2,4 @@
 .arduino/
 .vscode/
 data/
-!data/config.example.json
+**/**/config.json
