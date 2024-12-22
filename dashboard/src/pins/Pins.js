@@ -9,22 +9,56 @@ export default function Pins({ config, saveConfig }) {
     const [selectedPinNum, setSelectedPinNum] = useState(""); // Selected pin number in modal
     const [selectedPinLabel, setSelectedPinLabel] = useState(""); // Selected pin label in modal
 
-    // Define available ESP8266 pins
-    const esp8266Pins = [
-        { label: "D0 (GPIO16)", value: 16 },
-        { label: "D1 (GPIO5)", value: 5 },
-        { label: "D2 (GPIO4)", value: 4 },
-        { label: "D3 (GPIO0)", value: "0" },
-        { label: "D4 (GPIO2)", value: 2 },
-        { label: "D5 (GPIO14)", value: 14 },
-        { label: "D6 (GPIO12)", value: 12 },
-        { label: "D7 (GPIO13)", value: 13 },
-        { label: "D8 (GPIO15)", value: 15 },
-        { label: "A0 (Analog)", value: "A0" },
+    // Define available ESP8266 and ESP32-S3-Zero pins
+
+    const allPins = [
+        { label: "GPIO 0", value: 0 },
+        { label: "GPIO 1", value: 1 },
+        { label: "GPIO 2", value: 2 },
+        { label: "GPIO 3", value: 3 },
+        { label: "GPIO 4", value: 4 },
+        { label: "GPIO 5", value: 5 },
+        { label: "GPIO 6", value: 6 },
+        { label: "GPIO 7", value: 7 },
+        { label: "GPIO 8", value: 8 },
+        { label: "GPIO 9", value: 9 },
+        { label: "GPIO 10", value: 10 },
+        { label: "GPIO 11", value: 11 },
+        { label: "GPIO 12", value: 12 },
+        { label: "GPIO 13", value: 13 },
+        { label: "GPIO 14", value: 14 },
+        { label: "GPIO 15", value: 15 },
+        { label: "GPIO 16", value: 16 },
+        { label: "GPIO 17", value: 17 },
+        { label: "GPIO 18", value: 18 },
+        { label: "GPIO 19", value: 19 },
+        { label: "GPIO 20", value: 20 },
+        { label: "GPIO 21", value: 21 },
+        { label: "GPIO 26", value: 26 },
+        { label: "GPIO 27", value: 27 },
+        { label: "GPIO 28", value: 28 },
+        { label: "GPIO 29", value: 29 },
+        { label: "GPIO 30", value: 30 },
+        { label: "GPIO 31", value: 31 },
+        { label: "GPIO 32", value: 32 },
+        { label: "GPIO 33", value: 33 },
+        { label: "GPIO 34", value: 34 },
+        { label: "GPIO 35", value: 35 },
+        { label: "GPIO 36", value: 36 },
+        { label: "GPIO 37", value: 37 },
+        { label: "GPIO 38", value: 38 },
+        { label: "GPIO 39", value: 39 },
+        { label: "GPIO 40", value: 40 },
+        { label: "GPIO 41", value: 41 },
+        { label: "GPIO 42", value: 42 },
+        { label: "GPIO 43", value: 43 },
+        { label: "GPIO 44", value: 44 },
+        { label: "GPIO 45", value: 45 },
+        { label: "GPIO 46", value: 46 },
     ];
 
     // Filter available pins
-    const pinOptions = esp8266Pins.filter(pin => !Object.keys(pins).includes(pin.value.toString()));
+    const pinOptions = allPins.filter(pin => !Object.keys(pins).includes(pin.value.toString()));
 
     useEffect(() => {
         if (config && config.pins) {
@@ -77,7 +111,7 @@ export default function Pins({ config, saveConfig }) {
 
     const handlePinNumberChange = (event) => {
         const selectedValue = event.target.value;
-        const selectedLabel = esp8266Pins.find(pin => pin.value === selectedValue)?.label || "";
+        const selectedLabel = allPins.find(pin => pin.value === selectedValue)?.label || "";
         setSelectedPinNum(selectedValue); // Update selected pin number
         setSelectedPinLabel(selectedLabel); // Update selected pin label
     };
