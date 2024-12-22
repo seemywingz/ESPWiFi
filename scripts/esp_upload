@@ -29,12 +29,12 @@ while getopts "d:p:e" opt; do
     p) SERIAL_PORT="$OPTARG" ;;
     e)
         ESP_PYTHON=""
-        ESP_UPLOAD_TOOL="$HOME/Library/Arduino15/packages/esp32/tools/esptool_py/4.5.1/esptool"
+        ESPTOOL_ARGS="-z"
+        ESP_UPLOAD_TOOL="$HOME/Library/Arduino15/packages/esp32/tools/esptool_py/4.9.dev3/esptool"
         ESP_MKFS_TOOL="$HOME/Library/Arduino15/packages/esp32/tools/mklittlefs/3.0.0-gnu12-dc7f933/mklittlefs"
         BLOCK_SIZE="4096"
         CHIP_BAUD="115200"
         IMAGE_SIZE="0x160000"
-        ESPTOOL_ARGS="-z"
         PARTITION_OFFSET="0x290000"
         ;;
     \?)

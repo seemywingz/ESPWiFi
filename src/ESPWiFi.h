@@ -27,6 +27,7 @@
 #define BCLK 26
 #define LRC 25
 #define DOUT 22
+#define LED_BUILTIN 2
 #endif
 
 class ESPWiFi {
@@ -85,10 +86,10 @@ class ESPWiFi {
   // Utils
   String getContentType(String filename);
   String getFileExtension(const String& filename);
-  String makeHTTPSRequest(const String& method, const String& url,
-                          const String& token = "",
-                          const String& contentType = "",
-                          const String& payload = "");
+  // String makeHTTPSRequest(const String& method, const String& url,
+  //                         const String& token = "",
+  //                         const String& contentType = "",
+  //                         const String& payload = "");
   void runAtInterval(unsigned int interval, unsigned long& lastIntervalRun,
                      std::function<void()> functionToRun);
 
@@ -103,11 +104,11 @@ class ESPWiFi {
   std::function<void()> audioResponse = []() {};
 
   // OpenAI
-  String openAI_URL = "https://api.openai.com";
-  String openAI_TTSEndpoint = "/v1/audio/speech";
-  String openAI_ChatEndpoint = "/v1/chat/completions";
-  String openAI_Chat(String text);
-  void openAI_TTS(String text, String filePath);
+  // String openAI_URL = "https://api.openai.com";
+  // String openAI_TTSEndpoint = "/v1/audio/speech";
+  // String openAI_ChatEndpoint = "/v1/chat/completions";
+  // String openAI_Chat(String text);
+  // void openAI_TTS(String text, String filePath);
 
   // #############################################################################################################
  private:
