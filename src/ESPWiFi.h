@@ -66,7 +66,6 @@ class ESPWiFi {
 
   // WiFi
   void connectToWifi();
-  void handleClient();
   void startAP();
   int selectBestChannel();
 

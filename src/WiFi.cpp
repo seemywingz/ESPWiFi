@@ -67,8 +67,6 @@ void ESPWiFi::startAP() {
   Serial.println(bestChannel);
 }
 
-void ESPWiFi::handleClient() { webServer.handleClient(); }
-
 void ESPWiFi::startMDNS() {
   String domain = config["mdns"];
   if (!MDNS.begin(domain)) {
@@ -84,8 +82,8 @@ void ESPWiFi::startClientTask() {
       [](void* param) {
         ESPWiFi* self = static_cast<ESPWiFi*>(param);
         while (true) {
-          self->handleClient();
-          vTaskDelay(10 / portTICK_PERIOD_MS);  // Adjust delay as needed
+          self->webServer.handleClient();
+          vTaskDelay(10 / portTICK_PERIOD_MS);  // 10ms delay
         }
       },
       "ClientHandlerTask",  // Task name
