@@ -14,6 +14,5 @@ void setup() {
 }
 
 void loop() {
-  wifi.handleClient();
   // wifi.handleAudio();
 }
