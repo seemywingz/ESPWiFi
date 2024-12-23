@@ -1,7 +1,8 @@
 {
-    "board": "esp8266:esp8266:nodemcuv2",
+    "board": "esp32:esp32:waveshare_esp32_s3_zero",
     "port": "/dev/tty.usbserial-14140",
     "output": ".arduino",
     "sketch": "ESPWiFi.ino",
-    "configuration": "xtal=160,vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=3232,non32xfer=fast,eesz=4M2M,led=2,ip=lm2f,dbg=Disabled,lvl=None____,wipe=none,baud=115200"
+    "configuration": "PSRAM=disabled,FlashMode=qio,LoopCore=1,EventsCore=1,USBMode=hwcdc,CDCOnBoot=default,MSCOnBoot=default,DFUOnBoot=default,UploadMode=default,PartitionScheme=default,CPUFreq=240,UploadSpeed=921600,DebugLevel=none,EraseFlash=none",
+    "programmer": "esptool"
 }

@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include <AudioFileSourceLittleFS.h>
 #include <AudioGeneratorMP3.h>
 #include <AudioOutputI2S.h>
 #include <IOPin.h>
@@ -95,13 +94,6 @@ class ESPWiFi {
 
   // GPIO
   void startGPIO();
-
-  // Audio
-  void startAudio();
-  void handleAudio();
-  bool pttEnabled = false;
-  void playMP3(String file);
-  std::function<void()> audioResponse = []() {};
 
   // OpenAI
   // String openAI_URL = "https://api.openai.com";
