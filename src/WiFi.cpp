@@ -67,12 +67,7 @@ void ESPWiFi::startAP() {
   Serial.println(bestChannel);
 }
 
-void ESPWiFi::handleClient() {
-  webServer.handleClient();
-#ifdef ESP8266
-  MDNS.update();
-#endif
-}
+void ESPWiFi::handleClient() { webServer.handleClient(); }
 
 void ESPWiFi::startMDNS() {
   String domain = config["mdns"];
@@ -82,6 +77,24 @@ void ESPWiFi::startMDNS() {
     MDNS.addService("http", "tcp", 80);
     Serial.println("\tDomain Name: " + domain + ".local");
   }
+}
+
+void ESPWiFi::startClientTask() {
+  xTaskCreatePinnedToCore(
+      [](void* param) {
+        ESPWiFi* self = static_cast<ESPWiFi*>(param);
+        while (true) {
+          self->handleClient();
+          vTaskDelay(10 / portTICK_PERIOD_MS);  // Adjust delay as needed
+        }
+      },
+      "ClientHandlerTask",  // Task name
+      4096,                 // Stack size
+      this,                 // Task parameter
+      1,                    // Priority
+      NULL,                 // Task handle
+      0                     // Core to run on (use core 0)
+  );
 }
 
 #endif  // ESPWIFI_WIFI_H
