@@ -73,7 +73,7 @@ void ESPWiFi::startMDNS() {
     Serial.println("Error setting up MDNS responder!");
   } else {
     MDNS.addService("http", "tcp", 80);
-    Serial.println("\tDomain Name: " + domain + ".local");
+    Serial.println("\tDomain Name: " + domain + ".local\n");
   }
 }
 
